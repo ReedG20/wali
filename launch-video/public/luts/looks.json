@@ -1,0 +1,27 @@
+[
+  {
+    "id": "wali-portra",
+    "title": "Portra (house look)",
+    "about": "Warm, soft and filmic. Lifted warm blacks, gentle highlight roll-off, greens pushed to olive, skin kept rich. Start here."
+  },
+  {
+    "id": "wali-late-light",
+    "title": "Late light",
+    "about": "Golden-hour push for the climbing gym and outdoor scenes: amber highlights, brown shadows, a touch more contrast."
+  },
+  {
+    "id": "wali-screen-glow",
+    "title": "Screen glow (before)",
+    "about": "For the doomscroll: low-key, muted and a little cool in the highlights, like a room lit by a phone. Cut to a warm look when he gets up."
+  },
+  {
+    "id": "wali-matte",
+    "title": "Matte",
+    "about": "Faded and calm: low contrast, lifted blacks, softened whites. For interstitials, long exposures and the end card."
+  },
+  {
+    "id": "wali-clean",
+    "title": "Clean",
+    "about": "The safe baseline: a little warmth and a little contrast, nothing that reads as a look. Good for app close-ups."
+  }
+]

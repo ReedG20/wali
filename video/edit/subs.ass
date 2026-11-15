@@ -1,0 +1,49 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Helvetica Neue,50,&H00FFFFFF,&H00FFFFFF,&H80000000,&H64000000,1,0,0,0,100,100,0,0,1,2.2,1.2,2,200,200,64,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.25,0:00:02.53,Default,,0,0,0,,Most AI wearables only record when you tell
+Dialogue: 0,0:00:02.53,0:00:03.25,Default,,0,0,0,,them to.
+Dialogue: 0,0:00:03.27,0:00:04.47,Default,,0,0,0,,A meeting, a lecture
+Dialogue: 0,0:00:04.49,0:00:05.23,Default,,0,0,0,,or a voice memo
+Dialogue: 0,0:00:05.25,0:00:07.37,Default,,0,0,0,,but the moments that matter the most aren’t
+Dialogue: 0,0:00:07.37,0:00:08.90,Default,,0,0,0,,the ones that you think to record.
+Dialogue: 0,0:00:09.26,0:00:13.74,Default,,0,0,0,,We think true understanding requires the context of
+Dialogue: 0,0:00:13.74,0:00:14.76,Default,,0,0,0,,your entire life.
+Dialogue: 0,0:00:14.78,0:00:15.78,Default,,0,0,0,,Not just one meeting
+Dialogue: 0,0:00:15.80,0:00:17.43,Default,,0,0,0,,but how your days actually go.
+Dialogue: 0,0:00:17.46,0:00:18.20,Default,,0,0,0,,Who lifts you up
+Dialogue: 0,0:00:18.22,0:00:19.85,Default,,0,0,0,,and what you keep putting off.
+Dialogue: 0,0:00:21.67,0:00:22.70,Default,,0,0,0,,One sec.
+Dialogue: 0,0:00:27.86,0:00:28.54,Default,,0,0,0,,That’s wali.
+Dialogue: 0,0:00:28.56,0:00:30.04,Default,,0,0,0,,It’s a pendant that listens to your life
+Dialogue: 0,0:00:30.04,0:00:31.73,Default,,0,0,0,,and helps you live it a little better.
+Dialogue: 0,0:00:32.09,0:00:33.63,Default,,0,0,0,,The pendant records all day
+Dialogue: 0,0:00:33.65,0:00:35.42,Default,,0,0,0,,even with your phone in your pocket.
+Dialogue: 0,0:00:35.51,0:00:36.55,Default,,0,0,0,,And when you open the app
+Dialogue: 0,0:00:36.57,0:00:37.54,Default,,0,0,0,,everything syncs.
+Dialogue: 0,0:00:38.15,0:00:39.44,Default,,0,0,0,,In the cloud
+Dialogue: 0,0:00:40.61,0:00:43.60,Default,,0,0,0,,every recording is transcribed and every speaker is labeled.
+Dialogue: 0,0:00:43.89,0:00:45.30,Default,,0,0,0,,Every voice gets a fingerprint
+Dialogue: 0,0:00:45.37,0:00:46.98,Default,,0,0,0,,so if you label a friend once
+Dialogue: 0,0:00:47.27,0:00:50.26,Default,,0,0,0,,wali knows them for every conversation later on.
+Dialogue: 0,0:00:50.89,0:00:51.92,Default,,0,0,0,,Several times a minute
+Dialogue: 0,0:00:52.03,0:01:00.11,Default,,0,0,0,,a fast decision model reads my latest conversation
+Dialogue: 0,0:01:00.11,0:01:02.36,Default,,0,0,0,,and decides if anything needs action.
+Dialogue: 0,0:01:02.61,0:01:03.91,Default,,0,0,0,,Usually, nothing does.
+Dialogue: 0,0:01:03.91,0:01:06.47,Default,,0,0,0,,But when something does
+Dialogue: 0,0:01:06.49,0:01:07.58,Default,,0,0,0,,it routes to an agent.
+Dialogue: 0,0:01:08.75,0:01:16.52,Default,,0,0,0,,That agent connects to thousands of apps through Composio.
+Dialogue: 0,0:01:16.91,0:01:18.76,Default,,0,0,0,,For anything without an integration
+Dialogue: 0,0:01:18.99,0:01:21.62,Default,,0,0,0,,like Canvas, it uses its own cloud browser.
+Dialogue: 0,0:01:22.95,0:01:24.77,Default,,0,0,0,,And since this weekend’s theme is Let’s Dig
+Dialogue: 0,0:01:24.77,0:01:26.57,Default,,0,0,0,,In, you can chat with your whole life
+Dialogue: 0,0:01:26.59,0:01:28.56,Default,,0,0,0,,on your phone or on the web.

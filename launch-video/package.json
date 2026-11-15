@@ -1,0 +1,30 @@
+{
+  "name": "wali-launch-video",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5190",
+    "build": "vite build",
+    "luts": "python3 scripts/make_luts.py",
+    "render": "node scripts/render.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@liquid-dom/core": "0.1.1",
+    "@liquid-dom/react": "0.1.1",
+    "react": "19",
+    "react-dom": "19"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@webgpu/types": "^0.1.74",
+    "playwright-core": "^1.65.1",
+    "typescript": "^7.0.2",
+    "vite": "8"
+  }
+}
