@@ -1,0 +1,6 @@
+# Each of these is its own repo
+/app/
+/backend/
+/firmware/
+/web/
+.DS_Store

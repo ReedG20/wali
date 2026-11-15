@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind · Today</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --oat:#F1ECE2; --bone:#F8F5EE; --side:#EAE4D8; --sand:#E5DDCE; --sand-2:#DCD3C2;
+  --line:rgba(40,33,24,.12); --line-2:rgba(40,33,24,.22);
+  --ink:#221E19; --ink-2:#5C554B; --ink-3:#8D8578;
+  --moss:#37432D; --moss-2:#56664A; --olive:#7D8762; --sage:#DCE0CC;
+  --clay:#B5603A; --clay-tint:#F1DFD1;
+  --serif:"Instrument Serif","Times New Roman",serif;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"Geist Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--oat);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.ico{width:16px;height:16px;flex-shrink:0}
+.app{display:grid;grid-template-columns:272px 1fr;height:100vh}
+
+/* SIDEBAR — Pi / Claude: tinted rail, quiet list, grouped by time like Clay */
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side-top{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 14px 22px}
+.wordmark{font-family:var(--serif);font-size:28px;line-height:1;display:flex;align-items:center;gap:7px}
+.wordmark i{width:8px;height:8px;border-radius:50%;background:var(--clay)}
+.icon-btn{width:32px;height:32px;border-radius:9px;border:0;background:transparent;display:grid;place-items:center;color:var(--ink-2)}
+.icon-btn:hover{background:rgba(40,33,24,.06)}
+.new-btn{margin:2px 14px 14px;height:38px;border-radius:12px;border:1px solid var(--line-2);background:var(--bone);display:flex;align-items:center;gap:9px;padding:0 12px;font-size:14px;font-weight:500}
+.new-btn kbd{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.nav{padding:0 10px;display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border:0;border-radius:10px;background:transparent;font-size:14px;color:var(--ink-2);text-align:left;width:100%}
+.nav button:hover{background:rgba(40,33,24,.05)}
+.nav button.on{background:var(--bone);color:var(--ink);box-shadow:0 1px 0 rgba(40,33,24,.06),0 0 0 1px var(--line)}
+.nav .badge{margin-left:auto;min-width:18px;height:18px;border-radius:9px;background:var(--clay);color:#fff;font-size:10.5px;display:grid;place-items:center;padding:0 5px;font-weight:500}
+.convs{flex:1;overflow:auto;padding:22px 10px 10px;min-height:0}
+.convs h6{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);padding:0 12px;margin:0 0 6px}
+.convs h6:not(:first-child){margin-top:18px}
+.convs button{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:10px;padding:7px 12px;font-size:13.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.convs button:hover{background:rgba(40,33,24,.05);color:var(--ink)}
+.convs button.on{color:var(--ink);background:rgba(40,33,24,.06)}
+.device{margin:10px 12px 12px;background:var(--bone);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;align-items:center;gap:12px}
+.device svg{flex-shrink:0}
+.device b{display:block;font-size:13px;font-weight:500}
+.device small{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.live{width:6px;height:6px;border-radius:50%;background:var(--clay);display:inline-block;animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
+.device .mute{margin-left:auto;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line-2);background:transparent;font-size:12px}
+.device.muted .live{background:var(--ink-3);animation:none}
+.me{display:flex;align-items:center;gap:10px;padding:10px 22px 18px;font-size:13px;color:var(--ink-2)}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:500;flex-shrink:0}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 24px;flex-shrink:0}
+.top h1{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1}
+.top .date{font-size:13px;color:var(--ink-3)}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.status-pill{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;color:var(--ink-2);background:var(--bone)}
+.menu-btn{display:none}
+.view{display:none;flex:1;min-height:0}
+.view.on{display:flex}
+
+/* CHAT — Perplexity column + right rail */
+.chat{flex:1;display:grid;grid-template-columns:1fr 320px;min-height:0}
+.thread-wrap{display:flex;flex-direction:column;min-height:0;min-width:0}
+.thread{flex:1;overflow:auto;padding:12px 24px 24px}
+.col{max-width:700px;margin:0 auto}
+.daymark{display:flex;align-items:center;gap:14px;margin:30px 0 26px}
+.daymark::before,.daymark::after{content:"";flex:1;height:1px;background:var(--line)}
+.msg{margin-bottom:30px}
+.who{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink-3);margin-bottom:10px}
+.who b{font-weight:500;color:var(--ink)}
+.mark{width:24px;height:24px;border-radius:50%;background:var(--moss);display:grid;place-items:center;flex-shrink:0}
+.mark::after{content:"";width:6px;height:6px;border-radius:50%;background:#E9A47F}
+.body{padding-left:33px;font-size:15.5px;line-height:1.66;color:var(--ink)}
+.body p+p{margin-top:10px}
+.greet{font-family:var(--serif);font-size:32px;line-height:1.1;margin-bottom:8px}
+.steps{display:flex;flex-direction:column;gap:4px;margin:0 0 12px}
+.stepl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-3)}
+.stepl svg{width:14px;height:14px}
+.user{display:flex;justify-content:flex-end;margin-bottom:30px}
+.user .bubble{background:var(--sand);border-radius:18px 18px 6px 18px;padding:10px 16px;max-width:72%;font-size:15px}
+.user .t{display:block;text-align:right;font-size:11.5px;color:var(--ink-3);margin-top:5px}
+.daystrip{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--bone);padding:14px 16px 10px}
+.strip{position:relative;height:30px;border-radius:8px;background:repeating-linear-gradient(90deg,rgba(40,33,24,.05) 0 1px,transparent 1px calc(100%/12));}
+.strip span{position:absolute;top:4px;bottom:4px;border-radius:6px;font-size:10.5px;color:#F4F1E8;padding:0 6px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.strip .m{background:var(--moss-2)}
+.strip .f{background:var(--sage);color:var(--moss)}
+.strip .s{background:var(--clay)}
+.strip-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:6px;letter-spacing:.06em}
+.done{display:flex;align-items:center;gap:10px;margin:-14px 0 30px 33px;font-size:13px;color:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:rgba(248,245,238,.6)}
+.done .ok{width:18px;height:18px;border-radius:50%;background:var(--sage);display:grid;place-items:center;color:var(--moss);flex-shrink:0}
+.done a{margin-left:auto;text-decoration:underline;text-underline-offset:3px;color:var(--ink);white-space:nowrap}
+
+/* NUDGE — Airbnb Trips notice: icon circle, bold title, quiet body, one action */
+.nudge{margin:0 0 30px 33px;background:var(--bone);border:1px solid var(--line);border-radius:18px;padding:16px 16px 16px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start}
+.nudge .ic{width:36px;height:36px;border-radius:50%;background:var(--clay-tint);color:var(--clay);display:grid;place-items:center}
+.nudge.sage .ic{background:var(--sage);color:var(--moss)}
+.nudge h4{font-size:14.5px;font-weight:500;margin:2px 0 3px}
+.nudge p{font-size:14px;color:var(--ink-2);line-height:1.5}
+.nudge .act{margin-top:12px;display:flex;align-items:center;gap:14px}
+.nudge .x{border:0;background:transparent;color:var(--ink-3);width:26px;height:26px;border-radius:8px;display:grid;place-items:center}
+.nudge .x:hover{background:rgba(40,33,24,.06)}
+.nudge .kick{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.btn{height:34px;padding:0 15px;border-radius:999px;border:1px solid var(--line-2);background:transparent;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{background:rgba(40,33,24,.04)}
+.btn.solid{background:var(--moss);border-color:var(--moss);color:#F4F1E8}
+.btn.solid:hover{background:#2C3624}
+.btn.ghost{border-color:transparent;color:var(--ink-3)}
+.source{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 8px;background:var(--bone)}
+.olist{list-style:none;margin:10px 0 4px;counter-reset:n}
+.olist li{counter-increment:n;display:grid;grid-template-columns:28px 1fr;padding:9px 0;border-top:1px solid var(--line)}
+.olist li:last-child{border-bottom:1px solid var(--line)}
+.olist li::before{content:counter(n);font-family:var(--serif);font-size:22px;line-height:1.05;color:var(--moss-2)}
+.quick{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+/* APPROVAL — Claude/Unify question card anatomy: header, hairline rows, actions footer */
+.approval{margin:4px 0 30px 33px;background:var(--bone);border:1px solid var(--line-2);border-radius:18px;overflow:hidden;box-shadow:0 18px 40px -28px rgba(40,33,24,.35);transition:opacity .3s}
+.ap-h{padding:16px 18px 14px;display:flex;gap:12px;align-items:flex-start}
+.ap-h .ic{width:36px;height:36px;border-radius:11px;background:var(--sage);color:var(--moss);display:grid;place-items:center;flex-shrink:0}
+.ap-h .lab{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.ap-h .lab i{width:6px;height:6px;border-radius:50%;background:var(--clay)}
+.ap-h h4{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.15}
+.ap-row{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:11px 18px;border-top:1px solid var(--line);font-size:14px}
+.ap-row .k{color:var(--ink-3);font-size:13px}
+.ap-row s{color:var(--ink-3)}
+.ap-msg{background:var(--oat);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.ap-f{border-top:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;gap:8px}
+.ap-f small{margin-left:auto;font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.approval.ok .ap-body{display:none}
+.ap-done{display:none;padding:14px 18px;font-size:14px;align-items:center;gap:10px}
+.approval.ok .ap-done{display:flex}
+.approval.ok{box-shadow:none;border-color:var(--line)}
+
+/* COMPOSER */
+.composer{padding:0 24px 18px;flex-shrink:0}
+.chips{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.chips button{white-space:nowrap;flex-shrink:0;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:12.5px;color:var(--ink-2)}
+.chips button:hover{background:var(--bone);color:var(--ink)}
+.box{background:var(--bone);border:1px solid var(--line-2);border-radius:20px;padding:12px 12px 10px 16px;box-shadow:0 10px 30px -22px rgba(40,33,24,.4)}
+.box textarea{width:100%;border:0;outline:0;background:transparent;resize:none;font-size:15px;line-height:1.5;height:26px}
+.box textarea::placeholder{color:var(--ink-3)}
+.box-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.box-row .send{margin-left:auto;width:34px;height:34px;border-radius:50%;border:0;background:var(--moss);color:#F4F1E8;display:grid;place-items:center}
+.fine{font-size:11.5px;color:var(--ink-3);text-align:center;margin-top:9px}
+
+/* RIGHT RAIL */
+.rail{border-left:1px solid var(--line);overflow:auto;padding:22px 20px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--bone);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card .eyebrow{display:block;margin-bottom:8px}
+.now-state{font-family:var(--serif);font-size:27px;line-height:1.08;margin-bottom:12px}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-top:1px solid var(--line);color:var(--ink-2)}
+.kv b{font-weight:500;color:var(--ink)}
+.up{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+.up:first-of-type{border-top:0;padding-top:2px}
+.up .tm{font-family:var(--mono);font-size:11px;color:var(--ink-3);width:42px;padding-top:2px}
+.up small{display:block;color:var(--ink-3);font-size:12px}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:1px 8px;border-radius:999px;margin-top:4px}
+.tag.g{background:var(--sage);color:var(--moss)}
+.tag.c{background:var(--clay-tint);color:#8F4527}
+.side-quest{background:linear-gradient(160deg,#E4E6D5,#D3D8BF);border-color:transparent}
+.side-quest h5{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.1;margin-bottom:6px}
+.side-quest p{font-size:13px;color:var(--ink-2);margin-bottom:12px}
+
+/* WEEK VIEW */
+.week{flex:1;overflow:auto;padding:30px 32px 60px}
+.wk{max-width:1080px;margin:0 auto}
+.hl{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;margin-bottom:26px}
+.hl .lab{color:var(--clay);font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.hl h2{font-family:var(--serif);font-weight:400;font-size:clamp(28px,3.2vw,40px);line-height:1.1;max-width:760px}
+.hl h2 span{color:var(--ink-3)}
+.seg{display:flex;background:var(--side);border-radius:999px;padding:3px;border:1px solid var(--line)}
+.seg button{border:0;background:transparent;height:28px;padding:0 14px;border-radius:999px;font-size:12.5px;color:var(--ink-2)}
+.seg button.on{background:var(--bone);color:var(--ink);box-shadow:0 1px 2px rgba(40,33,24,.12)}
+.chart-card{background:var(--bone);border:1px solid var(--line);border-radius:22px;padding:20px 22px 14px}
+.chart-head{display:flex;align-items:center;gap:18px;margin-bottom:6px;flex-wrap:wrap}
+.chart-head h3{font-family:var(--serif);font-weight:400;font-size:24px}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-2);margin-left:auto}
+.legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:18px;background:var(--bone);margin:14px 0}
+.stat{padding:16px 18px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat .eyebrow{display:block}
+.stat b{display:block;font-weight:300;font-size:30px;letter-spacing:-.025em;line-height:1.15;margin:8px 0 3px}
+.stat small{font-size:12.5px;color:var(--ink-3)}
+.stat .up2{color:var(--moss-2)}
+.two{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
+.panel{background:var(--bone);border:1px solid var(--line);border-radius:22px;padding:20px 22px 10px}
+.panel h3{font-family:var(--serif);font-weight:400;font-size:24px}
+.panel .sub{font-size:13px;color:var(--ink-3);margin:2px 0 12px}
+.rel{display:grid;grid-template-columns:34px minmax(0,1fr) 150px 62px;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.rel .nm{font-size:14px;font-weight:500;line-height:1.3}
+.rel .nm small{display:block;font-weight:400;color:var(--ink-3);font-size:12px}
+.bar{position:relative;height:8px;border-radius:4px;background:var(--side)}
+.bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
+.bar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.rel .lbl{font-size:12px;text-align:right}
+.lbl.g{color:var(--moss-2)}.lbl.c{color:var(--clay)}.lbl.n{color:var(--ink-3)}
+.bar-axis{display:grid;grid-template-columns:34px minmax(0,1fr) 150px 62px;gap:12px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;padding-bottom:8px}
+.bar-axis span:nth-child(3){display:flex;justify-content:space-between}
+.pat{padding:14px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:30px 1fr;gap:4px}
+.pat .n{font-family:var(--serif);font-size:24px;line-height:1;color:var(--clay)}
+.pat p{font-size:14px;line-height:1.5}
+.pat a{display:inline-block;margin-top:6px;font-size:13px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+
+.scrim{display:none}
+@media (max-width:1240px){ .chat{grid-template-columns:1fr} .rail{display:none} }
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:284px;z-index:30;transform:translateX(-100%);transition:transform .3s ease}
+  .side.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.2)}
+  .scrim.on{display:block;position:fixed;inset:0;background:rgba(34,30,25,.25);z-index:25}
+  .menu-btn{display:grid}
+  .top{padding:0 14px;gap:10px}
+  .top .date{display:none}
+  .status-pill span.t{display:none}
+  .thread{padding:6px 16px 20px}
+  .composer{padding:0 14px 12px}
+  .body,.nudge,.approval,.done{margin-left:0;padding-left:0}
+  .nudge{padding:14px}
+  .ap-row{grid-template-columns:1fr;gap:4px}
+  .ap-f{flex-wrap:wrap}
+  .ap-f small{margin-left:0;width:100%;order:9}
+  .user .bubble{max-width:86%}
+  .week{padding:22px 16px 40px}
+  .hl{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(2){border-right:0}
+  .stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .two{grid-template-columns:1fr}
+  .rel{grid-template-columns:34px minmax(0,1fr) 90px}
+  .rel .lbl{display:none}
+  .bar-axis{grid-template-columns:34px minmax(0,1fr) 90px}
+  .bar-axis span:nth-child(4){display:none}
+  .legend{margin-left:0}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .fine{display:none}
+  .chart{overflow-x:auto;margin:0 -22px;padding:0 22px}
+  .chart svg{min-width:660px}
+  .chart-card{padding:18px 18px 10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="Sidebar">
+    <div class="side-top">
+      <a href="landing.html" class="wordmark">mind<i></i></a>
+      <button class="icon-btn" aria-label="Search"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg></button>
+    </div>
+    <button class="new-btn"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>New conversation<kbd>⌘K</kbd></button>
+    <nav class="nav">
+      <button class="on" data-go="today"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg>Today<span class="badge">1</span></button>
+      <button data-go="week"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 11c2-4 3.5-4 5 0s3 4 5 0 2.5-5 3-6"/></svg>Your week</button>
+      <button><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="2.5"/><path d="M1.5 14c.5-2.5 2.3-4 4.5-4s4 1.5 4.5 4"/><circle cx="11.5" cy="5" r="2"/><path d="M11 9.2c1.9 0 3.2 1.3 3.5 3.3"/></svg>People</button>
+      <button><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2" width="11" height="12" rx="2"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3"/></svg>Memory</button>
+    </nav>
+    <div class="convs">
+      <h6>Today</h6>
+      <button class="on">Making the 4pm less awful</button>
+      <button>What to bring up with Priya</button>
+      <h6>This week</h6>
+      <button>Sunday slump, again</button>
+      <button>Pottery or the climbing gym?</button>
+      <button>Notes · offsite planning walk</button>
+      <button>Why Thursdays feel better</button>
+      <h6>Earlier</h6>
+      <button>Dad's 70th, ideas</button>
+      <button>Reading streak, week 3</button>
+      <button>Flat 4B chores rota</button>
+    </div>
+    <div class="device" id="device">
+      <svg width="34" height="40" viewBox="100 230 100 150" aria-hidden="true">
+        <defs><radialGradient id="f2" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#FBF8F1"/><stop offset=".6" stop-color="#E9E2D4"/><stop offset="1" stop-color="#C9BEA9"/></radialGradient></defs>
+        <path d="M138 230 C 144 250, 148 262, 150 270 M162 230 C 156 250, 152 262, 150 270" stroke="#2E2A22" stroke-width="3" fill="none"/>
+        <rect x="143" y="262" width="14" height="22" rx="7" fill="#B9B2A6"/>
+        <circle cx="150" cy="328" r="46" fill="#B4AC9F"/><circle cx="150" cy="328" r="41" fill="url(#f2)"/>
+        <circle cx="150" cy="328" r="5" fill="#C9744A"/>
+      </svg>
+      <div><b>Pendant</b><small><span class="live"></span><span id="devState">Listening · 64%</span></small></div>
+      <button class="mute" id="muteBtn">Pause</button>
+    </div>
+    <div class="me"><span class="av" style="background:#D9CDBA">MC</span>Maya Chen<button class="icon-btn" style="margin-left:auto" aria-label="Settings"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg></button></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="top">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open sidebar"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4.5h12M2 8h12M2 11.5h8"/></svg></button>
+      <h1 id="title">Today</h1><span class="date" id="date">Saturday, 14 November</span>
+      <div class="right">
+        <span class="status-pill"><span class="live"></span><span class="t">Listening · only to you</span></span>
+      </div>
+    </header>
+
+    <!-- TODAY / CHAT -->
+    <section class="view on" id="v-today">
+      <div class="chat">
+        <div class="thread-wrap">
+          <div class="thread" id="thread">
+            <div class="col" id="col">
+              <div class="daymark"><span class="eyebrow">Saturday · 14 November</span></div>
+
+              <div class="msg">
+                <div class="who"><span class="mark"></span><b>Mind</b>7:58 am</div>
+                <div class="body">
+                  <div class="greet">Morning, Maya.</div>
+                  <div class="steps">
+                    <span class="stepl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>Read your calendar · 6 events</span>
+                    <span class="stepl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 2.5a5.5 5.5 0 1 0 3.5 9.5A6 6 0 0 1 10 2.5Z"/></svg>Checked last night's sleep · 6h 10m</span>
+                  </div>
+                  <p>A short night, and the day is front-loaded: three meetings before noon, then Sam at 4. You have a clear hour at 1, and it stays dry until 3 if you want to get outside.</p>
+                  <div class="daystrip" aria-label="Today at a glance">
+                    <div class="strip">
+                      <span class="m" style="left:8.3%;width:12%">Standup</span>
+                      <span class="m" style="left:21.5%;width:11%">Design crit</span>
+                      <span class="m" style="left:33.5%;width:7%">1:1</span>
+                      <span class="f" style="left:41.7%;width:8.3%">Free</span>
+                      <span class="s" style="left:66.7%;width:6.2%">Sam</span>
+                      <span class="f" style="left:87.5%;width:12%">Ana · dinner</span>
+                    </div>
+                    <div class="strip-axis"><span>8 AM</span><span>11</span><span>2 PM</span><span>5</span><span>8 PM</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="done"><span class="ok"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.2 5 8.5 9.5 3.5"/></svg></span><span>Declined “Q4 all-hands rehearsal (optional)” for you. You said rehearsals are skippable.</span><a href="#">Undo</a></div>
+
+              <div class="daymark"><span class="eyebrow">1:47 pm</span></div>
+              <div class="nudge" id="nudge1">
+                <span class="ic"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4.5" y="1.5" width="7" height="13" rx="1.6"/><path d="M7 12h2"/></svg></span>
+                <div>
+                  <h4>52 minutes on TikTok</h4>
+                  <p>Want to finish the chapter you started Tuesday? You were on page 112 of <i>Piranesi</i>, and you've got 40 quiet minutes before your 2:30.</p>
+                  <div class="act"><button class="btn solid">Open the book</button></div>
+                </div>
+                <button class="x" aria-label="Dismiss" data-dismiss="nudge1"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" stroke-width="1.4"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>
+              </div>
+
+              <div class="user"><div><div class="bubble">ok, fair. what was I meant to bring up with Priya later?</div><span class="t">2:31 pm</span></div></div>
+
+              <div class="msg">
+                <div class="who"><span class="mark"></span><b>Mind</b>2:31 pm</div>
+                <div class="body">
+                  <p>From your walk together on Wednesday evening:</p>
+                  <ol class="olist">
+                    <li><span>She's waiting on your notes for the offsite deck. You told her Friday.</span></li>
+                    <li><span>You offered to introduce her to Jonah at Fieldwork.</span></li>
+                    <li><span>Her mum's surgery is on Monday. Worth asking how she's feeling about it.</span></li>
+                  </ol>
+                  <span class="source"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 5v6M5 3v10M8 6v4M11 4v8M14 6.5v3"/></svg>Conversation · Wed 6:40 pm · 23 min · You, Priya</span>
+                  <div class="quick"><button class="btn">Draft the intro to Jonah</button><button class="btn ghost">I'll handle it</button></div>
+                </div>
+              </div>
+
+              <div class="user"><div><div class="bubble">thanks. and ugh, Sam at 4. can we make that less awful?</div><span class="t">3:12 pm</span></div></div>
+
+              <div class="msg" style="margin-bottom:14px">
+                <div class="who"><span class="mark"></span><b>Mind</b>3:12 pm</div>
+                <div class="body">
+                  <div class="steps"><span class="stepl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 5v6M5 3v10M8 6v4M11 4v8M14 6.5v3"/></svg>Compared your last 3 calls with Sam</span></div>
+                  <p>Your last two 4pm calls with Sam ran over by 20 minutes, and both times you were quieter for the rest of the evening. Thursday at 10 is open for both of you, and you're usually sharper before lunch.</p>
+                </div>
+              </div>
+
+              <div class="approval" id="approval">
+                <div class="ap-body">
+                  <div class="ap-h">
+                    <span class="ic"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg></span>
+                    <div><div class="lab"><i></i><span class="eyebrow" style="color:var(--clay)">Needs your OK</span></div><h4>Mind wants to reschedule your 4pm with Sam.</h4></div>
+                  </div>
+                  <div class="ap-row"><span class="k">From</span><span><s>Today · 4:00 – 4:45 pm</s></span></div>
+                  <div class="ap-row"><span class="k">To</span><span>Thursday 19 Nov · 10:00 – 10:45 am</span></div>
+                  <div class="ap-row"><span class="k">Message to Sam</span><div class="ap-msg">Hi Sam, could we move today's sync to Thursday at 10? I'd like to give the launch scope proper attention rather than squeeze it in. Thanks! Maya</div></div>
+                  <div class="ap-f">
+                    <button class="btn solid" id="approveBtn">Approve</button><button class="btn">Edit</button><button class="btn ghost" id="notNow">Not now</button>
+                    <small><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>Calendar + Gmail · sends as you</small>
+                  </div>
+                </div>
+                <div class="ap-done"><span class="ok" style="width:20px;height:20px;border-radius:50%;background:var(--sage);display:grid;place-items:center;color:var(--moss)"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 6.2 5 8.5 9.5 3.5"/></svg></span><span id="doneText">Moved to Thursday at 10. Sam has the note. Your 4pm is now free.</span><a href="#" style="margin-left:auto;text-decoration:underline;text-underline-offset:3px;font-size:13px" id="undo">Undo</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer">
+            <div class="col">
+              <div class="chips"><button>Plan my free hour</button><button>How was this week?</button><button>Who should I see more?</button></div>
+              <form class="box" id="composer">
+                <textarea id="input" rows="1" placeholder="Talk it through with Mind…" aria-label="Message"></textarea>
+                <div class="box-row">
+                  <button type="button" class="icon-btn" aria-label="Attach"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg></button>
+                  <button type="button" class="icon-btn" aria-label="Voice"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5"/><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5v2"/></svg></button>
+                  <button class="send" aria-label="Send"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg></button>
+                </div>
+              </form>
+              <div class="fine">Mind remembers this conversation. Long-press any message to make it forget.</div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="rail" aria-label="Right now">
+          <div class="card">
+            <span class="eyebrow">Right now</span>
+            <div class="now-state">Steady, a little wired.</div>
+            <svg viewBox="0 0 280 54" width="100%" height="54" aria-label="Energy today, dipping mid-morning and recovering after lunch">
+              <path d="M0 30 C 30 22, 50 18, 70 26 S 110 44, 130 40 S 170 20, 196 18" fill="none" stroke="#56664A" stroke-width="2" stroke-linecap="round"/>
+              <path d="M196 18 C 220 16, 250 22, 280 26" fill="none" stroke="#56664A" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" opacity=".55"/>
+              <circle cx="196" cy="18" r="4.5" fill="#F8F5EE" stroke="#37432D" stroke-width="2"/>
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin:2px 0 10px;letter-spacing:.06em"><span>8 AM</span><span>NOW</span><span>10 PM</span></div>
+            <div class="kv"><span>Deep focus</span><b>2h 10m</b></div>
+            <div class="kv"><span>Conversations</span><b>4 · 1h 35m</b></div>
+            <div class="kv"><span>Phone today</span><b>1h 22m</b></div>
+          </div>
+          <div class="card">
+            <span class="eyebrow">Up next</span>
+            <div class="up"><span class="tm">4:00</span><div>Sync with Sam<small>Waiting on your OK to move</small><span class="tag c">Usually drains</span></div></div>
+            <div class="up"><span class="tm">6:30</span><div>Dinner with Ana<small>Nopalito, 9th Ave</small><span class="tag g">Restores</span></div></div>
+          </div>
+          <div class="card side-quest">
+            <span class="eyebrow">Sidequest · Sunday</span>
+            <h5>Wheel-throwing, 10 am</h5>
+            <p>An open session at Clay Oakland, 12 minutes away. You've saved three pottery videos this month.</p>
+            <button class="btn solid">Hold a spot · $28</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- YOUR WEEK -->
+    <section class="view" id="v-week">
+      <div class="week">
+        <div class="wk">
+          <div class="hl">
+            <div>
+              <div class="lab"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 11c2-4 3.5-4 5 0s3 4 5 0 2.5-5 3-6"/></svg>This week</div>
+              <h2>Steadier than last week. Your best days started outside, <span>and your low point was Sunday evening, again.</span></h2>
+            </div>
+            <div class="seg" role="tablist"><button class="on">Week</button><button>Month</button><button>Year</button></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Mood &amp; energy</h3><span class="eyebrow">8 – 14 Nov</span>
+              <div class="legend"><span><i style="background:var(--moss-2)"></i>Mood</span><span><i style="background:var(--clay);height:0;border-top:2px dashed var(--clay)"></i>Energy</span></div>
+            </div>
+            <div class="chart" id="chart"></div>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><span class="eyebrow">Deep focus</span><b>11h 40m</b><small class="up2">↑ 2h 05m vs last week</small></div>
+            <div class="stat"><span class="eyebrow">Doomscrolling</span><b>3h 05m</b><small class="up2">↓ 38% · 4 spirals caught</small></div>
+            <div class="stat"><span class="eyebrow">Conversations</span><b>27</b><small>11h 50m · 9 people</small></div>
+            <div class="stat"><span class="eyebrow">Sidequests</span><b>2 of 3</b><small>Bookshop crawl, sunrise swim</small></div>
+          </div>
+
+          <div class="two">
+            <div class="panel">
+              <h3>Relationship energy</h3>
+              <p class="sub">How you sounded after time with each person, over the last 30 days.</p>
+              <div class="bar-axis"><span></span><span></span><span><span>Drains</span><span>Restores</span></span><span></span></div>
+              <div id="rels"></div>
+            </div>
+            <div class="panel">
+              <h3>Mind noticed</h3>
+              <p class="sub">Patterns worth a small change. Nothing here is a rule.</p>
+              <div class="pat"><span class="n">1</span><div><p>You read on 5 of the 6 nights your phone charged in the kitchen. On the other nights, you didn't read at all.</p><a href="#">Remind me at 10 pm</a></div></div>
+              <div class="pat"><span class="n">2</span><div><p>Calls after 4 pm cost you about 40 minutes of evening energy. Mornings don't.</p><a href="#">Protect my afternoons</a></div></div>
+              <div class="pat"><span class="n">3</span><div><p>Sunday from 6 to 9 pm is your lowest stretch. Both times you had a plan, it wasn't.</p><a href="#">Plan this Sunday</a></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+// view switching
+const views={today:['Today','Saturday, 14 November'],week:['Your week','8 – 14 November']};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-go]').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.go));
+  $('#title').textContent=views[b.dataset.go][0];$('#date').textContent=views[b.dataset.go][1];
+  closeSide();
+});
+// sidebar (mobile)
+const side=$('#side'),scrim=$('#scrim');
+function closeSide(){side.classList.remove('open');scrim.classList.remove('on')}
+$('#menuBtn').onclick=()=>{side.classList.add('open');scrim.classList.add('on')};
+scrim.onclick=closeSide;
+document.querySelectorAll('.convs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.convs button').forEach(x=>x.classList.toggle('on',x===b));closeSide()});
+// pendant pause
+$('#muteBtn').onclick=()=>{const d=$('#device');const m=d.classList.toggle('muted');$('#devState').textContent=m?'Paused · 64%':'Listening · 64%';$('#muteBtn').textContent=m?'Resume':'Pause'};
+// nudges
+document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=()=>{const n=document.getElementById(b.dataset.dismiss);n.style.opacity=0;setTimeout(()=>n.remove(),250)});
+// approval
+const ap=$('#approval');
+$('#approveBtn').onclick=()=>{ap.classList.add('ok');document.querySelector('.nav .badge')?.remove()};
+$('#notNow').onclick=()=>{$('#doneText').textContent="Okay, leaving the 4pm as it is. I'll keep the note for Sam in case you change your mind.";ap.classList.add('ok');$('#undo').textContent='Bring it back';document.querySelector('.nav .badge')?.remove()};
+$('#undo').onclick=e=>{e.preventDefault();ap.classList.remove('ok');$('#undo').textContent='Undo';$('#doneText').textContent='Moved to Thursday at 10. Sam has the note. Your 4pm is now free.'};
+// composer
+const thread=$('#thread'),col=$('#col');
+const toBottom=(smooth)=>{thread.scrollTo({top:thread.scrollHeight,behavior:smooth&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'auto'})};
+function addUser(t){const d=document.createElement('div');d.className='user';d.innerHTML='<div><div class="bubble"></div><span class="t">now</span></div>';d.querySelector('.bubble').textContent=t;col.appendChild(d);toBottom(true)}
+function addMind(t){const d=document.createElement('div');d.className='msg';d.innerHTML='<div class="who"><span class="mark"></span><b>Mind</b>now</div><div class="body"><p></p></div>';d.querySelector('p').textContent=t;col.appendChild(d);toBottom(true)}
+const replies=["Got it. I'll hold onto that and bring it back when it's useful.","Your free hour is 1 to 2. Last time you walked to the lake at lunch, your afternoon focus doubled. Want me to block it as a walk?","Ana and your dad, mostly. You've seen Ana twice this month and both times left lighter. Want me to suggest a time?"];
+$('#composer').onsubmit=e=>{e.preventDefault();const v=$('#input').value.trim();if(!v)return;addUser(v);$('#input').value='';setTimeout(()=>addMind(replies[0]),900)};
+$('#input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#composer').requestSubmit()}});
+document.querySelectorAll('.chips button').forEach((b,i)=>b.onclick=()=>{addUser(b.textContent);setTimeout(()=>addMind(replies[i]||replies[0]),900)});
+toBottom();addEventListener('load',()=>toBottom());document.fonts&&document.fonts.ready.then(()=>toBottom());
+if(location.hash==='#week')document.querySelector('[data-go=week]').click();
+
+// week chart (SVG, smooth curves)
+(function(){
+  const W=1000,H=280,pl=8,pr=86,pt=24,pb=38;
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const mood=[.30,.52,.80,.66,.42,.62,.72], energy=[.38,.60,.86,.58,.34,.55,.64];
+  const x=i=>pl+(W-pl-pr)*(i/6), y=v=>pt+(H-pt-pb)*(1-v);
+  const path=a=>{let d=`M${x(0)},${y(a[0])}`;for(let i=1;i<a.length;i++){const x0=x(i-1),x1=x(i),y0=y(a[i-1]),y1=y(a[i]),c=(x1-x0)/2;d+=` C${x0+c},${y0} ${x1-c},${y1} ${x1},${y1}`}return d};
+  const levels=[['bright',.85],['steady',.55],['low',.25]];
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mood and energy across the week: low Sunday, peak Tuesday, dip Thursday, recovering by Saturday"><defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#56664A" stop-opacity=".18"/><stop offset="1" stop-color="#56664A" stop-opacity="0"/></linearGradient></defs>`;
+  levels.forEach(([l,v])=>{s+=`<line x1="${pl}" x2="${W-pr+18}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(40,33,24,.10)"/><text x="${W-pr+28}" y="${y(v)+4}" font-family="Geist" font-size="13" fill="#8D8578">${l}</text>`});
+  s+=`<rect x="${x(4)-46}" y="${pt-6}" width="92" height="${H-pt-pb+6}" rx="10" fill="rgba(181,96,58,.06)"/>`;
+  s+=`<path d="${path(mood)} L${x(6)},${H-pb} L${x(0)},${H-pb} Z" fill="url(#ar)"/>`;
+  s+=`<path d="${path(energy)}" fill="none" stroke="#B5603A" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round"/>`;
+  s+=`<path d="${path(mood)}" fill="none" stroke="#56664A" stroke-width="2.6" stroke-linecap="round"/>`;
+  days.forEach((d,i)=>{s+=`<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-family="Geist Mono" font-size="11.5" letter-spacing="1" fill="${i===6?'#221E19':'#8D8578'}">${d.toUpperCase()}</text>`});
+  const notes=[[0,mood[0],'Sunday evening, alone',1],[2,mood[2],'Run with Ana · 7 am',-1],[4,mood[4],'Launch review ran 90 min',1]];
+  notes.forEach(([i,v,t,dir])=>{const cx=x(i),cy=y(v),ty=dir<0?cy-18:cy+(i===4?50:28);s+=`<circle cx="${cx}" cy="${cy}" r="5.5" fill="#F8F5EE" stroke="#37432D" stroke-width="2"/><text x="${cx+(i===0?4:0)}" y="${ty}" text-anchor="${i===0?'start':'middle'}" font-family="Geist" font-size="13" fill="#5C554B">${t}</text>`});
+  s+=`<circle cx="${x(6)}" cy="${y(mood[6])}" r="5.5" fill="#37432D"/>`;
+  s+='</svg>';
+  $('#chart').innerHTML=s;
+})();
+// relationships
+const rels=[
+ ['AR','Ana Ruiz','Friend · 4 times · 6h 10m',.82,'#DCE0CC','#37432D'],
+ ['PS','Priya Shah','Colleague · 6 times · 3h 40m',.5,'#E7D9C3','#6B4E25'],
+ ['DC','Dad','Calls · 3 times · 1h 25m',.42,'#E2D6CF','#6A4B3C'],
+ ['JO','Jonah Okoye','Fieldwork · 2 times · 50m',.06,'#DDD8CC','#5C554B'],
+ ['4B','Flat 4B group chat','Messages · daily',-.34,'#E5DDCE','#5C554B'],
+ ['SP','Sam Patel','Manager · 5 times · 3h 55m',-.62,'#F1DFD1','#8F4527']
+];
+$('#rels').innerHTML=rels.map(([i,n,m,v,bg,fg])=>{
+  const w=Math.abs(v)*50, left=v>=0?50:50-w, col=v>.15?'#56664A':v<-.15?'#B5603A':'#A39B8E';
+  const lbl=v>.15?['g','Restores']:v<-.15?['c','Drains']:['n','Neutral'];
+  return `<div class="rel"><span class="av" style="background:${bg};color:${fg};width:34px;height:34px">${i}</span><div class="nm">${n}<small>${m}</small></div><div class="bar"><i style="left:${left}%;width:${Math.max(w,2)}%;background:${col}"></i></div><span class="lbl ${lbl[0]}">${lbl[1]}</span></div>`}).join('');
+</script>
+</body>
+</html>

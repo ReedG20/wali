@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind Design Drafts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#F1ECE3; --ink:#1D1A16; --mute:#7A7166; --line:#DCD4C7; --card:#F8F5EF; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--ink); font:15px/1.5 Inter, system-ui, sans-serif; padding:64px 16px 96px; }
+  .wrap { max-width:1240px; margin:0 auto; }
+  h1 { font:400 clamp(44px,7vw,84px)/1 "Instrument Serif", serif; letter-spacing:-.01em; }
+  h1 em { color:var(--mute); }
+  .lede { color:var(--mute); max-width:560px; margin:18px 0 56px; }
+  .row { display:grid; grid-template-columns:260px 1fr 1fr; gap:24px; padding:32px 0; border-top:1px solid var(--line); align-items:start; }
+  .meta .n { font:500 12px/1 ui-monospace, monospace; letter-spacing:.08em; color:var(--mute); }
+  .meta h2 { font:400 40px/1.05 "Instrument Serif", serif; margin:10px 0 8px; }
+  .meta p { color:var(--mute); font-size:14px; margin-bottom:16px; }
+  .links a { display:inline-block; margin:0 6px 6px 0; padding:7px 14px; border:1px solid var(--line); border-radius:999px; color:var(--ink); text-decoration:none; font-size:13px; background:var(--card); }
+  .links a:hover { border-color:var(--ink); }
+  .shot { display:block; aspect-ratio:16/10; border-radius:10px; overflow:hidden; border:1px solid var(--line); background:var(--card); }
+  .shot img { width:100%; height:100%; object-fit:cover; object-position:top; display:block; transition:transform .4s ease; }
+  .shot:hover img { transform:scale(1.015); }
+  .cap { font-size:12px; color:var(--mute); margin-top:8px; }
+  @media (max-width:900px){ .row { grid-template-columns:1fr; } }
+  @media (prefers-reduced-motion:reduce){ .shot img { transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mind, <em>five directions</em></h1>
+  <p class="lede">Each direction has a landing page and a web app in the same visual language. NOTES.md lists every Mobbin reference it borrowed from.</p>
+
+  <div class="row">
+    <div class="meta"><div class="n">01</div><h2>Ground</h2><p>Earthy hardware launch: oat, moss and clay. Closest to the Soma vibe. Calm, chat-first app.</p>
+      <div class="links"><a href="01-ground/landing.html">Landing</a><a href="01-ground/app.html">App</a><a href="01-ground/app.html#week">Your week</a><a href="01-ground/NOTES.md">Notes</a></div></div>
+    <div><a class="shot" href="01-ground/landing.html"><img src="01-ground/shot-landing.png" alt="Ground landing"></a><div class="cap">Landing</div></div>
+    <div><a class="shot" href="01-ground/app.html"><img src="01-ground/shot-app.png" alt="Ground app"></a><div class="cap">App · Chat</div></div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><div class="n">02</div><h2>Journal</h2><p>Editorial memoir of your days: newsprint, Bodoni and vermilion. The chat works like a notebook with notes in the margin.</p>
+      <div class="links"><a href="02-journal/landing.html">Landing</a><a href="02-journal/app.html">App</a><a href="02-journal/app.html#notes">Conversation notes</a><a href="02-journal/NOTES.md">Notes</a></div></div>
+    <div><a class="shot" href="02-journal/landing.html"><img src="02-journal/shot-landing.png" alt="Journal landing"></a><div class="cap">Landing</div></div>
+    <div><a class="shot" href="02-journal/app.html"><img src="02-journal/shot-app.png" alt="Journal app"></a><div class="cap">App · Notebook</div></div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><div class="n">03</div><h2>Instrument</h2><p>The mind as a measured signal: warm espresso dark with an amber accent. Scores, day timeline, and chat with data cards.</p>
+      <div class="links"><a href="03-instrument/landing.html">Landing</a><a href="03-instrument/app.html">App</a><a href="03-instrument/app.html#today">Today</a><a href="03-instrument/app.html#patterns">Patterns</a><a href="03-instrument/NOTES.md">Notes</a></div></div>
+    <div><a class="shot" href="03-instrument/landing.html"><img src="03-instrument/shot-landing.png" alt="Instrument landing"></a><div class="cap">Landing</div></div>
+    <div><a class="shot" href="03-instrument/app.html#today"><img src="03-instrument/shot-app-today.png" alt="Instrument app"></a><div class="cap">App · Today</div></div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><div class="n">04</div><h2>Aura</h2><p>Colour is mood: painterly late-afternoon light behind crisp, flat UI. "Your day in colour."</p>
+      <div class="links"><a href="04-aura/landing.html">Landing</a><a href="04-aura/app.html">App</a><a href="04-aura/app.html#day">Day in colour</a><a href="04-aura/NOTES.md">Notes</a></div></div>
+    <div><a class="shot" href="04-aura/landing.html"><img src="04-aura/shot-landing.png" alt="Aura landing"></a><div class="cap">Landing</div></div>
+    <div><a class="shot" href="04-aura/app.html"><img src="04-aura/shot-app.png" alt="Aura app"></a><div class="cap">App · Chat</div></div>
+  </div>
+
+  <div class="row">
+    <div class="meta"><div class="n">05</div><h2>Object</h2><p>Industrial-design-led, with spec callouts, safety orange and a visible grid. The app is an "OS for your mind," with toggles you arm before anything sends.</p>
+      <div class="links"><a href="05-object/landing.html">Landing</a><a href="05-object/app.html">App</a><a href="05-object/app.html?v=quests">Sidequests</a><a href="05-object/app.html?v=device">Device</a><a href="05-object/NOTES.md">Notes</a></div></div>
+    <div><a class="shot" href="05-object/landing.html"><img src="05-object/shot-landing.png" alt="Object landing"></a><div class="cap">Landing</div></div>
+    <div><a class="shot" href="05-object/app.html"><img src="05-object/shot-app.png" alt="Object app"></a><div class="cap">App · Chat</div></div>
+  </div>
+</div>
+</body>
+</html>

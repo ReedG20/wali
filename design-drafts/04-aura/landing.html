@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind — weather for your head</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,200..500,100;1,9..144,200..500,100&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F0E8; --paper-2:#FBF7F1; --paper-3:#EFE6DB;
+  --ink:#2B2521; --ink-2:#5E544D; --ink-3:#8C8179;
+  --line:rgba(43,37,33,.12); --line-2:rgba(43,37,33,.22);
+  --peach:#F3B48D; --rose:#DE9E9A; --sage:#AFC3A0; --sky:#A8C5DB; --gold:#F0CF93;
+  --serif:"Fraunces", Georgia, serif; --sans:"Figtree", system-ui, sans-serif;
+  --r-lg:28px; --r-md:20px; --r-sm:12px;
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .17  0 0 0 0 .14  0 0 0 0 .12  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{text-wrap:balance}
+button,input{font:inherit;color:inherit}
+.serif{font-family:var(--serif);font-variation-settings:"SOFT" 100, "WONK" 0}
+em{font-style:italic}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+
+/* ---------- Aura primitive ---------- */
+.aura{position:absolute;inset:0;overflow:hidden;isolation:isolate}
+.aura .b{position:absolute;border-radius:50%;filter:blur(72px);mix-blend-mode:multiply;opacity:.9;will-change:transform;animation:drift 26s ease-in-out infinite alternate}
+.aura .s{position:absolute;border-radius:50%;filter:blur(26px);mix-blend-mode:multiply;opacity:.55;transform:rotate(-24deg);animation:streak 34s ease-in-out infinite alternate}
+.aura::after{content:"";position:absolute;inset:0;background-image:var(--grain);opacity:.16;mix-blend-mode:multiply;pointer-events:none}
+@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-4%,0) scale(1.08)}100%{transform:translate3d(-4%,3%,0) scale(.96)}}
+@keyframes streak{0%{transform:rotate(-24deg) translateX(0)}100%{transform:rotate(-20deg) translateX(6%)}}
+
+/* ---------- Pendant primitive ---------- */
+.pendant{position:relative;width:var(--size,112px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#fffdf9 0%,#F1EADF 38%,#D9CCBD 78%,#C7B8A7 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 -8px 18px rgba(120,96,74,.18) inset,0 24px 40px -14px rgba(92,64,44,.35),0 4px 10px rgba(92,64,44,.12)}
+.pendant::before{content:"";position:absolute;inset:21%;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#fff7ef,var(--glow,#F3B48D) 55%,color-mix(in srgb,var(--glow,#F3B48D) 70%,#8a5a3c) 100%);
+  box-shadow:0 0 0 1px rgba(80,56,40,.10),0 0 26px 4px color-mix(in srgb,var(--glow,#F3B48D) 70%,transparent);
+  animation:breathe 5.5s ease-in-out infinite}
+.pendant::after{content:"";position:absolute;left:50%;top:-9%;width:22%;height:16%;transform:translateX(-50%);border-radius:40% 40% 30% 30%;
+  background:linear-gradient(#E7DDD1,#C8BAA9);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+@keyframes breathe{0%,100%{opacity:.82;transform:scale(.97)}50%{opacity:1;transform:scale(1.02)}}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 24px;border-radius:999px;border:0;cursor:pointer;font-weight:500;font-size:15px;transition:transform .2s, background .2s}
+.btn-ink{background:var(--ink);color:var(--paper-2)}
+.btn-ink:hover{background:#000}
+.btn-ghost{background:transparent;color:var(--ink);padding:0 6px}
+.btn-ghost span{border-bottom:1px solid var(--line-2);padding-bottom:2px}
+.btn:active{transform:scale(.98)}
+
+/* ---------- Nav (floating, inside hero) ---------- */
+.nav{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:min(1040px,calc(100% - 40px));height:52px;z-index:5;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px 0 20px;background:rgba(251,247,241,.92);border-radius:12px;box-shadow:0 1px 0 rgba(43,37,33,.06),0 10px 30px -18px rgba(43,37,33,.35)}
+.nav .links{display:flex;gap:24px;font-size:14px;color:var(--ink-2)}
+.nav .links a:hover{color:var(--ink)}
+.wordmark{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:400;font-size:26px;letter-spacing:-.02em;line-height:1;display:flex;align-items:center;gap:8px}
+.wordmark i{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--peach) 60%);box-shadow:0 0 10px var(--peach)}
+.nav .right{justify-self:end}
+.nav .btn{height:38px;padding:0 16px;font-size:14px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;margin:12px;border-radius:var(--r-lg);overflow:hidden;min-height:clamp(760px,94vh,900px);background:#F8EDE2}
+.hero .aura .b1{width:62vw;height:62vw;left:-14vw;bottom:-30vw;background:var(--peach)}
+.hero .aura .b2{width:48vw;height:48vw;right:-12vw;top:-16vw;background:var(--rose);animation-delay:-8s}
+.hero .aura .b3{width:36vw;height:36vw;left:4vw;top:-14vw;background:var(--sky);opacity:.55;animation-delay:-14s}
+.hero .aura .b4{width:30vw;height:30vw;right:16vw;bottom:-10vw;background:var(--gold);opacity:.7;animation-delay:-4s}
+.hero .aura .s1{width:40vw;height:7vw;left:8vw;top:56%;background:#F6A77E}
+.hero .aura .s2{width:30vw;height:5vw;right:2vw;top:30%;background:#E8A3A0;animation-delay:-10s}
+.hero .aura .s3{width:22vw;height:4vw;left:56%;bottom:12%;background:#F2C08F;animation-delay:-20s}
+.necklace{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.necklace path{fill:none;stroke:rgba(70,48,34,.38);stroke-width:1.25;vector-effect:non-scaling-stroke}
+.hero-pendant{position:absolute;left:50%;top:calc(31% - 6px);transform:translate(-50%,-50%);z-index:2;--size:clamp(84px,8vw,116px)}
+.hero-copy{position:relative;z-index:3;min-height:inherit;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:0 24px 128px}
+.hero h1{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100,"opsz" 144;font-size:clamp(58px,9.2vw,148px);line-height:.92;letter-spacing:-.035em;color:#2A211C}
+.hero h1 em{font-weight:300;letter-spacing:-.02em}
+.hero p.lede{max-width:520px;margin:28px auto 0;font-size:19px;line-height:1.5;color:#4C413A}
+.hero .ctas{margin-top:32px;display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap}
+.forecast{position:absolute;left:20px;bottom:20px;z-index:4;display:flex;align-items:center;gap:10px;height:36px;padding:0 14px 0 8px;border-radius:999px;background:rgba(251,247,241,.85);font-size:13px;color:var(--ink-2)}
+.forecast b{font-weight:600;color:var(--ink)}
+.forecast .dot{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--sky) 65%)}
+.scrollhint{position:absolute;right:24px;bottom:28px;z-index:4;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+
+/* ---------- Lyrics: a day in nudges ---------- */
+.day{position:relative;padding:150px 0 140px;overflow:hidden}
+.day .aura .b{filter:blur(90px);opacity:.7;transition:background 1.6s ease}
+.day .aura .d1{width:46vw;height:46vw;right:-10vw;top:10%;background:var(--sky)}
+.day .aura .d2{width:30vw;height:30vw;right:18vw;bottom:-6vw;background:var(--peach);opacity:.45;animation-delay:-9s}
+.day .aura::after{opacity:.1}
+.day-grid{position:relative;z-index:2;display:grid;grid-template-columns:300px 1fr;gap:64px;align-items:start}
+.day-intro h2{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100;font-size:40px;line-height:1.05;letter-spacing:-.02em;margin-top:18px}
+.day-intro p{margin-top:18px;color:var(--ink-2);font-size:16px;max-width:280px}
+.lines{list-style:none;display:flex;flex-direction:column;gap:30px}
+.lines li{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:baseline;cursor:pointer;transition:opacity .9s ease, filter .9s ease;opacity:.24;filter:blur(1.6px)}
+.lines li.on{opacity:1;filter:none}
+.lines time{font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px}
+.lines time i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.lines q{quotes:none;font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:350;font-size:clamp(26px,3.1vw,42px);line-height:1.14;letter-spacing:-.018em;max-width:820px}
+
+/* ---------- How it works (big numerals) ---------- */
+.how{padding:120px 0 120px;border-top:1px solid var(--line)}
+.how-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px}
+.how-top a{font-size:15px;border-bottom:1px solid var(--line-2)}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.how h2{font-size:clamp(36px,4.2vw,56px);line-height:1.04;letter-spacing:-.025em;font-weight:400}
+.how h2 .serif{font-weight:300;display:block}
+.how .body{margin-top:56px;font-size:21px;line-height:1.45;color:#3c332d;max-width:500px}
+.how .body + .body{margin-top:22px}
+.step{border-top:1px solid var(--ink);display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px;padding-top:6px;min-height:200px}
+.step:last-child{border-bottom:1px solid var(--ink)}
+.step .lbl{padding-bottom:22px}
+.step .lbl b{display:block;font-weight:500;font-size:16px}
+.step .lbl span{display:block;color:var(--ink-3);font-size:15px;max-width:260px;margin-top:4px}
+.step .num{font-family:var(--serif);font-weight:200;font-variation-settings:"SOFT" 100,"opsz" 144;font-size:clamp(120px,14vw,196px);line-height:.78;letter-spacing:-.06em;color:var(--ink);padding-bottom:4px}
+
+/* ---------- Pendant / daylight ---------- */
+.object{position:relative;margin:0 12px;border-radius:var(--r-lg);overflow:hidden;background:#F5C6A3;padding:96px 0 88px}
+.object .shade{position:absolute;inset:-20%;background:repeating-linear-gradient(104deg,transparent 0 70px,rgba(120,62,30,.22) 70px 92px,transparent 92px 150px,rgba(120,62,30,.16) 150px 166px);filter:blur(9px);transform:skewX(-14deg);mix-blend-mode:multiply;opacity:.85}
+.object .warm{position:absolute;width:60vw;height:60vw;right:-20vw;top:-20vw;border-radius:50%;background:#FBE0B8;filter:blur(80px);opacity:.9}
+.object::after{content:"";position:absolute;inset:0;background-image:var(--grain);opacity:.14;mix-blend-mode:multiply}
+.object-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr 1fr;gap:72px;align-items:center}
+.plate{position:relative;aspect-ratio:4/4.3;border-radius:6px;overflow:hidden;background:linear-gradient(160deg,#EBDCCB,#D9C3AB);box-shadow:0 30px 60px -30px rgba(92,48,22,.45)}
+.plate .linen{position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 5px),repeating-linear-gradient(0deg,rgba(80,50,30,.04) 0 1px,transparent 1px 4px)}
+.plate .light{position:absolute;inset:-10%;background:repeating-linear-gradient(112deg,transparent 0 60px,rgba(90,50,24,.20) 60px 84px,transparent 84px 130px);filter:blur(7px);mix-blend-mode:multiply}
+.plate .sun{position:absolute;width:70%;height:70%;left:-10%;top:-12%;border-radius:50%;background:#FFE9C7;filter:blur(60px);opacity:.75}
+.plate svg{position:absolute;inset:0;width:100%;height:100%}
+.plate svg path{fill:none;stroke:rgba(70,44,28,.55);stroke-width:1.4}
+.plate .p1{position:absolute;left:52%;top:57%;transform:translate(-50%,-50%) rotate(-12deg);--size:31%;--glow:#F3B48D}
+.plate .cap{position:absolute;left:18px;bottom:16px;font-size:12px;color:rgba(43,37,33,.7);letter-spacing:.04em}
+.object h2{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100;font-size:clamp(40px,4.6vw,64px);line-height:1;letter-spacing:-.03em;color:#2E2019}
+.object p.sub{margin-top:22px;font-size:18px;color:#5a4031;max-width:440px}
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:56px}
+.specs svg{width:26px;height:26px;stroke:#2E2019;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.specs b{display:block;font-weight:600;font-size:15px;margin-top:14px;color:#2E2019}
+.specs span{display:block;font-size:14px;color:#6a4d3c;margin-top:4px;line-height:1.4}
+
+/* ---------- Use cases (tabs + panel) ---------- */
+.cases{padding:140px 0 120px;text-align:center}
+.cases h2{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100;font-size:clamp(40px,5vw,68px);letter-spacing:-.03em;line-height:1.02}
+.cases > .wrap > p{margin:18px auto 0;color:var(--ink-2);max-width:460px}
+.tabs{margin:56px 0 18px;display:flex;gap:2px;padding:4px;border-radius:12px;background:var(--paper-3);width:max-content;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:transparent;height:36px;padding:0 14px;border-radius:9px;font-size:14px;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tabs button i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.tabs button[aria-selected=true]{background:var(--paper-2);color:var(--ink);box-shadow:0 1px 2px rgba(43,37,33,.08)}
+.panel{position:relative;border-radius:var(--r-lg);overflow:hidden;min-height:520px;text-align:left;display:grid;grid-template-columns:1fr 440px;gap:40px;padding:56px;background:var(--paper-3)}
+.panel .aura .b{filter:blur(70px);opacity:.95;transition:background 1.2s ease}
+.panel .aura .p1{width:70%;height:120%;left:-20%;top:-30%;background:var(--pa)}
+.panel .aura .p2{width:60%;height:100%;right:-20%;bottom:-40%;background:var(--pb);animation-delay:-11s}
+.panel .aura .p3{width:40%;height:60%;left:30%;bottom:-30%;background:var(--pc);opacity:.6;animation-delay:-5s}
+.story{position:relative;z-index:2;align-self:end;max-width:420px}
+.story .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(43,37,33,.6);font-weight:500}
+.story p{margin-top:14px;font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:350;font-size:24px;line-height:1.3;letter-spacing:-.01em}
+.story p + p{margin-top:12px}
+.story .muted{color:rgba(43,37,33,.55)}
+.card{position:relative;z-index:2;align-self:center;background:var(--paper-2);border-radius:18px;padding:22px;box-shadow:0 1px 0 rgba(43,37,33,.04),0 30px 60px -30px rgba(70,40,20,.4);border:1px solid rgba(43,37,33,.06)}
+.card .meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-3)}
+.card .meta .orb{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--c) 70%);box-shadow:0 0 10px color-mix(in srgb,var(--c) 70%,transparent)}
+.card .meta b{color:var(--ink);font-weight:600}
+.card h3{font-weight:500;font-size:18px;line-height:1.4;margin-top:14px;letter-spacing:-.005em}
+.card .list{margin-top:16px;border-top:1px solid var(--line)}
+.card .list div{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-2)}
+.card .list div b{font-weight:500;color:var(--ink)}
+.card .acts{display:flex;gap:8px;margin-top:18px}
+.card .acts .btn{height:42px;font-size:14px;flex:1;justify-content:center;padding:0 16px}
+.card .acts .sec{background:var(--paper-3);color:var(--ink)}
+.card .note{margin-top:12px;font-size:12.5px;color:var(--ink-3);display:flex;gap:8px;align-items:center}
+.card .note i{width:6px;height:6px;border-radius:50%;background:#D79A5C}
+.swatches{display:flex;gap:4px;margin-left:auto}
+.swatches i{width:14px;height:14px;border-radius:4px;background:var(--c)}
+
+/* ---------- Privacy ---------- */
+.privacy{padding:130px 0 130px;border-top:1px solid var(--line);text-align:center}
+.privacy h2{margin-top:22px;font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100;font-size:clamp(44px,6.2vw,88px);line-height:1;letter-spacing:-.035em}
+.privacy h2 em{color:#9a6a4e}
+.pcols{margin-top:88px;display:grid;grid-template-columns:repeat(3,1fr);text-align:left}
+.pcols > div{padding:0 40px;border-left:1px solid var(--line)}
+.pcols > div:first-child{border-left:0;padding-left:0}
+.pcols > div:last-child{padding-right:0}
+.pcols h3{font-family:var(--serif);font-weight:350;font-variation-settings:"SOFT" 100;font-size:30px;line-height:1.08;letter-spacing:-.02em}
+.pcols p{margin-top:16px;color:var(--ink-2);font-size:16px}
+
+/* ---------- Waitlist ---------- */
+.join{position:relative;margin:0 12px;border-radius:var(--r-lg);overflow:hidden;padding:150px 24px 140px;text-align:center;background:#F7EFE6}
+.join .aura .j1{width:50vw;height:30vw;left:25vw;bottom:-18vw;background:var(--peach)}
+.join .aura .j2{width:40vw;height:26vw;left:-6vw;bottom:-14vw;background:var(--sage);opacity:.75;animation-delay:-6s}
+.join .aura .j3{width:40vw;height:26vw;right:-6vw;bottom:-14vw;background:var(--sky);opacity:.8;animation-delay:-12s}
+.join .aura .j4{width:26vw;height:18vw;right:24vw;top:-12vw;background:var(--rose);opacity:.35;animation-delay:-3s}
+.join > *:not(.aura){position:relative;z-index:2}
+.join .pendant{margin:0 auto 34px;--size:64px;--glow:#A8C5DB}
+.join h2{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100;font-size:clamp(40px,5vw,64px);line-height:1.04;letter-spacing:-.03em}
+.join p{margin:16px auto 0;color:var(--ink-2);max-width:420px}
+.form{margin:36px auto 0;display:flex;gap:8px;justify-content:center;max-width:460px}
+.form input{flex:1;min-width:0;height:48px;border-radius:999px;border:1px solid var(--line);background:rgba(251,247,241,.9);padding:0 20px;font-size:15px;outline:none}
+.form input:focus{border-color:var(--ink-3)}
+.proof{margin-top:22px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:14px;color:var(--ink-2)}
+.proof b{color:var(--ink);font-weight:600}
+.faces{display:flex}
+.faces i{width:28px;height:28px;border-radius:50%;border:2px solid #F7EFE6;margin-left:-6px;background:var(--c);display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:600;color:rgba(43,37,33,.7)}
+.faces i:first-child{margin-left:0}
+.thanks{display:none;margin-top:36px;font-family:var(--serif);font-size:24px}
+
+/* ---------- Footer ---------- */
+footer{padding:64px 32px 28px;position:relative}
+.ftop{display:flex;justify-content:space-between;gap:40px;align-items:flex-start}
+.ftop p{max-width:300px;color:var(--ink-2);font-size:15px}
+.fcols{display:flex;gap:64px}
+.fcols div{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.fcols div span{color:var(--ink-3);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.fcols a{color:var(--ink-2)} .fcols a:hover{color:var(--ink)}
+.bigmark{font-family:var(--serif);font-weight:300;font-variation-settings:"SOFT" 100,"opsz" 144;font-size:41vw;line-height:.78;letter-spacing:-.065em;text-align:center;margin:40px 0 18px;white-space:nowrap;color:var(--ink);position:relative}
+.bigmark .o{display:inline-block;width:.15em;height:.15em;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--peach) 60%,#d58c62);vertical-align:.08em;margin-left:.02em;box-shadow:0 0 .1em var(--peach)}
+.fbot{display:flex;justify-content:space-between;gap:20px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);border-top:1px solid var(--line);padding-top:18px}
+.fbot div{display:flex;gap:24px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .day-grid,.how-grid,.object-grid{grid-template-columns:1fr;gap:40px}
+  .panel{grid-template-columns:1fr;padding:32px;gap:28px}
+  .story{align-self:start}
+  .pcols{grid-template-columns:1fr;gap:40px}
+  .pcols > div{border-left:0;padding:0;border-top:1px solid var(--line);padding-top:28px}
+  .pcols > div:first-child{border-top:0;padding-top:0}
+  .nav .links{display:none}
+  .nav{grid-template-columns:auto 1fr}
+  .nav .wordmark{justify-self:start}
+}
+@media (max-width:640px){
+  .wrap{padding:0 20px}
+  .hero{margin:8px;border-radius:22px;min-height:720px}
+  .nav{top:12px;width:calc(100% - 24px);padding-left:16px}
+  .hero-copy{padding-bottom:110px}
+  .hero p.lede{font-size:17px}
+  .hero-pendant{top:25%}
+  .forecast{left:12px;bottom:14px;font-size:12px}
+  .scrollhint{display:none}
+  .day{padding:100px 0}
+  .lines li{grid-template-columns:1fr;gap:6px}
+  .how{padding:88px 0}
+  .how-top{margin-bottom:32px}
+  .how .body{margin-top:28px;font-size:18px}
+  .step{min-height:150px}
+  .object{margin:0 8px;padding:64px 0}
+  .specs{grid-template-columns:1fr;gap:22px;margin-top:36px}
+  .specs > div{display:grid;grid-template-columns:30px 1fr;column-gap:14px}
+  .specs > div svg{grid-row:span 2}
+  .specs b{margin-top:0}
+  .cases{padding:96px 0 80px}
+  .tabs{margin-top:36px}
+  .panel{padding:22px;min-height:0;border-radius:22px}
+  .story p{font-size:20px}
+  .privacy{padding:96px 0}
+  .join{margin:0 8px;padding:96px 20px}
+  .form{flex-direction:column}
+  .form input{flex:none;height:48px}
+  .form .btn{justify-content:center}
+  footer{padding:48px 20px 24px}
+  .ftop{flex-direction:column}
+  .fcols{gap:40px}
+  .fbot{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .lines li{opacity:1;filter:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="aura" aria-hidden="true">
+    <i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i>
+    <i class="s s1"></i><i class="s s2"></i><i class="s s3"></i>
+  </div>
+  <svg class="necklace" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 372 0 C 392 160, 470 262, 500 286"/>
+    <path d="M 628 0 C 608 160, 530 262, 500 286"/>
+  </svg>
+  <nav class="nav" aria-label="Main">
+    <div class="links"><a href="#how">How it works</a><a href="#cases">Use cases</a><a href="#privacy">Privacy</a></div>
+    <a class="wordmark" href="#top"><i></i>mind</a>
+    <div class="right"><a class="btn btn-ink" href="#join">Join the waitlist</a></div>
+  </nav>
+  <div class="pendant hero-pendant" style="--glow:#F3B48D" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1><em>Weather</em> for<br>your mind.</h1>
+    <p class="lede">A small pendant that listens to your day, learns what lifts you and what drains you, and speaks up at the right moment.</p>
+    <div class="ctas">
+      <a class="btn btn-ink" href="#join">Join the waitlist</a>
+      <a class="btn btn-ghost" href="#day"><span>Hear a day with Mind</span></a>
+    </div>
+  </div>
+  <div class="forecast"><span class="dot"></span><span><b>Now</b> · Mostly calm, clearing after a heavy morning</span></div>
+  <div class="scrollhint">Scroll</div>
+</header>
+
+<!-- ============ A DAY, IN NUDGES ============ -->
+<section class="day" id="day">
+  <div class="aura" aria-hidden="true"><i class="b d1" id="dayBlob"></i><i class="b d2"></i></div>
+  <div class="wrap day-grid">
+    <div class="day-intro">
+      <div class="eyebrow">A Thursday, with Mind</div>
+      <h2>It mostly stays quiet. Then it says one useful thing.</h2>
+      <p>Six nudges across one real-feeling day. Each one comes from something it heard, remembered or noticed.</p>
+    </div>
+    <ol class="lines" id="lines">
+      <li data-c="#A8C5DB" style="--c:#A8C5DB"><time><i></i>7:12</time><q>Slept six hours ten. Go easy before ten. Your first call isn't until half past.</q></li>
+      <li data-c="#AFC3A0" style="--c:#AFC3A0"><time><i></i>9:48</time><q>You've said "I'll do it later" three times about the Dana email. Two lines would do it.</q></li>
+      <li data-c="#F3B48D" style="--c:#F3B48D"><time><i></i>12:30</time><q>Lunch with Priya again this week? You come back lighter every time.</q></li>
+      <li data-c="#DE9E9A" style="--c:#DE9E9A"><time><i></i>15:40</time><q>You've been on TikTok for 52 minutes. Want to finish the chapter you started Tuesday?</q></li>
+      <li data-c="#F0CF93" style="--c:#F0CF93"><time><i></i>18:05</time><q>The ceramics studio on 5th has a 7pm drop-in. You brought it up in March.</q></li>
+      <li data-c="#A8C5DB" style="--c:#A8C5DB"><time><i></i>22:40</time><q>Phone down in ten? You wanted to be up for the run.</q></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="how-top"><div class="eyebrow">How it works</div><a href="#cases">See it in use</a></div>
+    <div class="how-grid">
+      <div>
+        <h2><span class="serif">It listens, it learns,</span>and then it speaks up.</h2>
+        <p class="body">Mind hears your day the way a good friend would. It notices who you were with, what you said you'd do, and how you sounded doing it.</p>
+        <p class="body">Over weeks, that becomes a memory of your people, your goals and your patterns. It uses that memory to nudge you, and when you let it, to act for you.</p>
+      </div>
+      <div>
+        <div class="step"><div class="lbl"><b>Wear it</b><span>A nine-gram pendant on a cord. It transcribes with speaker labels, and its light is on whenever it listens.</span></div><div class="num">01</div></div>
+        <div class="step"><div class="lbl"><b>It understands</b><span>It builds a private memory of your people, habits and moods, and it can tell a draining call from a restoring one.</span></div><div class="num">02</div></div>
+        <div class="step"><div class="lbl"><b>It nudges, or acts</b><span>One timely sentence, or a small task done through your apps. Anything risky waits for your yes.</span></div><div class="num">03</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE OBJECT ============ -->
+<section class="object" aria-labelledby="objTitle">
+  <div class="warm" aria-hidden="true"></div>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="wrap object-grid">
+    <div class="plate" aria-hidden="true">
+      <div class="sun"></div><div class="linen"></div>
+      <svg viewBox="0 0 400 430" preserveAspectRatio="none"><path d="M -10 40 C 80 90, 150 140, 193 178"/><path d="M 410 96 C 330 130, 240 160, 193 178"/></svg>
+      <div class="pendant p1"></div>
+      <div class="light"></div>
+      <div class="cap">Mind pendant, Sandstone. Shown actual size.</div>
+    </div>
+    <div>
+      <div class="eyebrow" style="color:#7a5640">The pendant</div>
+      <h2 id="objTitle" style="margin-top:18px">Small enough to forget. Honest about when it's on.</h2>
+      <p class="sub">Ceramic, warm to the touch, and about the size of a coin. It has no screen and doesn't buzz. You only hear from it when something matters.</p>
+      <div class="specs">
+        <div><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 6V3M9.5 3h5"/></svg><b>Nine grams</b><span>Lighter than most rings on a chain.</span></div>
+        <div><svg viewBox="0 0 24 24"><rect x="3" y="7" width="16" height="10" rx="3"/><path d="M21 11v2M7 10v4M10.5 10v4"/></svg><b>Four days a charge</b><span>Drops onto a wooden dock at night.</span></div>
+        <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg><b>Light means listening</b><span>Press once to pause. It goes dark, and so does the mic.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USE CASES ============ -->
+<section class="cases" id="cases">
+  <div class="wrap">
+    <h2>What it's like to live with</h2>
+    <p>Six small moments from early testers' days, slightly edited for privacy.</p>
+    <div style="display:flex;justify-content:center"><div class="tabs" role="tablist" id="tabs"></div></div>
+    <div class="panel" id="panel">
+      <div class="aura" aria-hidden="true"><i class="b p1"></i><i class="b p2"></i><i class="b p3"></i></div>
+      <div class="story" id="story"></div>
+      <div class="card" id="card"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRIVACY ============ -->
+<section class="privacy" id="privacy">
+  <div class="wrap">
+    <div class="eyebrow">Privacy</div>
+    <h2>Your mind is yours.<br><em>We just help you read it.</em></h2>
+    <div class="pcols">
+      <div><h3>Heard on your phone, not on our servers</h3><p>Transcription and mood reading run on your phone. Raw audio is deleted within the hour unless you ask Mind to keep a conversation.</p></div>
+      <div><h3>Nothing acts without your rules</h3><p>You decide what Mind can do alone, like a reminder or a calendar hold, and what always needs your yes, like a message or a payment.</p></div>
+      <div><h3>Forget anything, any time</h3><p>Say "Mind, forget that" or delete a person, a day or everything. Deletion is permanent and takes effect within minutes.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WAITLIST ============ -->
+<section class="join" id="join">
+  <div class="aura" aria-hidden="true"><i class="b j1"></i><i class="b j2"></i><i class="b j3"></i><i class="b j4"></i></div>
+  <div class="pendant" aria-hidden="true"></div>
+  <h2>The first pendants ship<br>in spring.</h2>
+  <p>Join the waitlist and we'll write when your place comes up. We send one email, and no newsletters.</p>
+  <form class="form" id="form">
+    <input type="email" required placeholder="you@example.com" aria-label="Email address">
+    <button class="btn btn-ink" type="submit">Join the waitlist</button>
+  </form>
+  <div class="thanks" id="thanks">Thank you. You're on the list.</div>
+  <div class="proof"><span class="faces"><i style="--c:#F3B48D">AK</i><i style="--c:#AFC3A0">JM</i><i style="--c:#A8C5DB">SO</i><i style="--c:#DE9E9A">LT</i></span><span><b>2,140 people</b> are already waiting</span></div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="ftop">
+    <p>Mind is a small team in Oakland and Copenhagen, making a calmer kind of wearable.</p>
+    <div class="fcols">
+      <div><span>Product</span><a href="#how">How it works</a><a href="#cases">Use cases</a><a href="app.html">Open the app</a></div>
+      <div><span>Trust</span><a href="#privacy">Privacy</a><a href="#privacy">Data deletion</a><a href="#privacy">Security</a></div>
+      <div><span>Say hello</span><a href="#">hello@mind.co</a><a href="#">Press kit</a></div>
+    </div>
+  </div>
+  <div class="bigmark" aria-hidden="true">mind<span class="o"></span></div>
+  <div class="fbot"><span>© 2026 Mind Labs, Inc.</span><div><a href="#privacy">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div></div>
+</footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* --- lyric-style day --- */
+const lines=[...document.querySelectorAll('#lines li')], blob=document.getElementById('dayBlob');
+let li=0, timer;
+function setLine(i){ li=i; lines.forEach((l,k)=>l.classList.toggle('on',k===i)); blob.style.background=lines[i].dataset.c; }
+function startLines(){ clearInterval(timer); if(reduce) return; timer=setInterval(()=>setLine((li+1)%lines.length),3600); }
+lines.forEach((l,k)=>l.addEventListener('click',()=>{setLine(k);startLines()}));
+setLine(3); startLines();
+
+/* --- use cases --- */
+const cases=[
+ {k:'Doomscroll',c:'#DE9E9A',pa:'#E9A9A3',pb:'#F3B48D',pc:'#A8C5DB',
+  story:[`<span class="k">11:52 pm, a Tuesday</span>`,`<p>Maya has been on TikTok for 52 minutes. Her voice went flat after a hard call at nine.</p>`,`<p class="muted">Mind doesn't tell her to stop. It offers one small next step, taken from something she already wanted.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#DE9E9A"></span><b>Mind</b> · nudge · just now</div><h3>You've been scrolling for 52 minutes. Want to finish the chapter of <i>Piranesi</i> you started Tuesday? It's 14 pages.</h3><div class="acts"><a class="btn btn-ink">Open the book</a><a class="btn sec">Not tonight</a></div><div class="note"><i></i>Based on a heavy call at 9:04 pm and your reading on Tuesday</div>`},
+ {k:'On your behalf',c:'#AFC3A0',pa:'#B9CBA8',pb:'#F0CF93',pc:'#A8C5DB',
+  story:[`<span class="k">4:10 pm, a Wednesday</span>`,`<p>Halfway through a meeting, Jon said, "Let's pick this up Friday." Nobody sent the invite.</p>`,`<p class="muted">Mind drafts it. Because it emails someone else, it waits for a yes.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#AFC3A0"></span><b>Mind</b> · needs your approval</div><h3>Send Jon a calendar invite for Friday at 2pm, "Pricing follow-up"?</h3><div class="list"><div><span>Calendar</span><b>Fri 15 Nov · 2:00–2:30</b></div><div><span>Guests</span><b>jon@northwind.co</b></div><div><span>Note</span><b>"Picking up from today"</b></div></div><div class="acts"><a class="btn btn-ink">Approve and send</a><a class="btn sec">Edit</a></div><div class="note"><i></i>Nothing is sent until you approve</div>`},
+ {k:'People',c:'#F3B48D',pa:'#F5BE94',pb:'#DE9E9A',pc:'#AFC3A0',
+  story:[`<span class="k">Sunday evening</span>`,`<p>After a month of listening, Mind can see who leaves Maya lighter and who leaves her tired.</p>`,`<p class="muted">It isn't a verdict on anyone. It's a pattern she couldn't see from the inside.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#F3B48D"></span><b>Mind</b> · your people, this month</div><div class="list"><div><span><b>Priya</b> · 6 lunches</span><span class="swatches"><i style="--c:#F3B48D"></i><i style="--c:#F3B48D"></i><i style="--c:#A8C5DB"></i><i style="--c:#F3B48D"></i></span></div><div><span><b>Dad</b> · 4 calls</span><span class="swatches"><i style="--c:#A8C5DB"></i><i style="--c:#A8C5DB"></i><i style="--c:#AFC3A0"></i><i style="--c:#A8C5DB"></i></span></div><div><span><b>Weekly sync</b> · 4 meetings</span><span class="swatches"><i style="--c:#DE9E9A"></i><i style="--c:#DE9E9A"></i><i style="--c:#AFC3A0"></i><i style="--c:#DE9E9A"></i></span></div></div><h3 style="font-size:16px">You haven't seen Priya in 12 days. Thursday lunch is free.</h3>`},
+ {k:'Sidequests',c:'#F0CF93',pa:'#F2D29A',pb:'#F3B48D',pc:'#AFC3A0',
+  story:[`<span class="k">Saturday, 10:20 am</span>`,`<p>Maya has mentioned pottery four times since March and done nothing about it.</p>`,`<p class="muted">Mind keeps a short list of small adventures drawn from what she talks about, and offers one when the weekend is open.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#F0CF93"></span><b>Mind</b> · sidequest</div><h3>Clay Hours on 5th has a beginner wheel class at 7pm tonight. Two spots left, $38.</h3><div class="list"><div><span>You mentioned it</span><b>4 times since March</b></div><div><span>Walk</span><b>14 min</b></div></div><div class="acts"><a class="btn btn-ink">Book a spot</a><a class="btn sec">Another time</a></div>`},
+ {k:'Habits',c:'#A8C5DB',pa:'#AFCBDF',pb:'#AFC3A0',pc:'#F0CF93',
+  story:[`<span class="k">Most weekdays, 10:40 pm</span>`,`<p>Maya wants to run before work. Most nights she's still on her phone at midnight.</p>`,`<p class="muted">Mind tracks the habit from what actually happens, with no logging, and nudges at the moment that decides it.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#A8C5DB"></span><b>Mind</b> · habit · morning run</div><h3>Phone down in ten? You wanted to be up at 6:30.</h3><div class="list"><div><span>This week</span><span class="swatches"><i style="--c:#AFC3A0"></i><i style="--c:#AFC3A0"></i><i style="--c:#DE9E9A"></i><i style="--c:#AFC3A0"></i><i style="--c:rgba(43,37,33,.1)"></i></span></div><div><span>Runs after a phone-down night</span><b>5 of 6</b></div></div>`},
+ {k:'Notes',c:'#C9B9D6',pa:'#D8C5CF',pb:'#A8C5DB',pc:'#F3B48D',
+  story:[`<span class="k">Right after a call</span>`,`<p>Forty minutes with a landlord, a contractor and two dates that kept moving.</p>`,`<p class="muted">Mind writes it down with who said what, and pulls out the parts that are now Maya's to do.</p>`],
+  card:`<div class="meta"><span class="orb" style="--c:#C9B9D6"></span><b>Mind</b> · conversation notes · 41 min</div><div class="list"><div><span><b>Ellen</b> (landlord)</span><span>Repairs start Mon 18th</span></div><div><span><b>Marco</b> (contractor)</span><span>Needs kitchen empty by Sun</span></div><div><span><b>You</b></span><span>Agreed to send photos tonight</span></div></div><div class="acts"><a class="btn btn-ink">Remind me at 8pm</a><a class="btn sec">Open notes</a></div>`}
+];
+const tabs=document.getElementById('tabs'), panel=document.getElementById('panel'), story=document.getElementById('story'), card=document.getElementById('card');
+cases.forEach((c,i)=>{const b=document.createElement('button');b.role='tab';b.style.setProperty('--c',c.c);b.innerHTML=`<i></i>${c.k}`;b.onclick=()=>show(i);tabs.appendChild(b)});
+function show(i){const c=cases[i];[...tabs.children].forEach((b,k)=>b.setAttribute('aria-selected',k===i));
+  panel.style.setProperty('--pa',c.pa);panel.style.setProperty('--pb',c.pb);panel.style.setProperty('--pc',c.pc);
+  story.innerHTML=c.story.join('');card.innerHTML=c.card;}
+show(0);
+
+/* --- waitlist --- */
+document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();e.target.style.display='none';document.getElementById('thanks').style.display='block'});
+</script>
+</body>
+</html>

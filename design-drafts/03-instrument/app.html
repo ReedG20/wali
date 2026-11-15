@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind — Tonight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#13100D; --bg-2:#181410; --panel:#1A1612; --raised:#231E19; --hover:#2A241E;
+  --line:rgba(240,226,204,.08); --line-2:rgba(240,226,204,.14); --line-3:rgba(240,226,204,.22);
+  --ink:#EFE7DA; --ink-2:#B3A897; --ink-3:#7E7468; --ink-4:#544B42;
+  --accent:#F2A649; --accent-dim:rgba(242,166,73,.14);
+  --focus:#C78428; --social:#2E9E86; --drift:#C2523F; --rest:#7085D6;
+  --sans:"Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex:none}
+.kbd{font-family:var(--mono);font-size:10px;color:var(--ink-4);border:1px solid var(--line-2);border-radius:4px;padding:0 5px;line-height:16px}
+
+.app{display:grid;grid-template-columns:236px 1fr;height:100vh}
+/* rail */
+.rail{display:flex;flex-direction:column;padding:12px 10px 12px 12px;gap:4px;min-height:0}
+.rail .brand{display:flex;align-items:center;gap:9px;font-weight:500;font-size:15px;padding:4px 6px 12px}
+.rail .brand .sp{margin-left:auto;color:var(--ink-4)}
+.device{border:1px solid var(--line);border-radius:10px;padding:10px 11px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;margin-bottom:14px;background:var(--bg-2)}
+.device .p{grid-row:span 2;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#4A4037,#1B1713 70%);border:1.5px solid #6B5D4E;position:relative}
+.device .p:after{content:"";position:absolute;left:50%;top:4px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.device b{font-weight:500;font-size:13px}
+.device span{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.nav a{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:7px;color:var(--ink-2);font-size:13.5px;cursor:pointer;text-decoration:none}
+.nav a:hover{background:rgba(240,226,204,.04);color:var(--ink)}
+.nav a.on{background:var(--raised);color:var(--ink)}
+.nav a svg{flex:none;opacity:.8}
+.nav a .kbd{margin-left:auto}
+.nav a .badge{margin-left:auto;font-family:var(--mono);font-size:10px;color:#1A1208;background:var(--accent);border-radius:999px;padding:0 6px;line-height:16px}
+.rail h5{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-4);font-weight:400;padding:18px 8px 6px}
+.threads{display:flex;flex-direction:column;overflow:auto;min-height:0;flex:1}
+.threads a{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;color:var(--ink-2);font-size:13px;cursor:pointer}
+.threads a span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.threads a span:last-child{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);flex:none}
+.threads a:hover{background:rgba(240,226,204,.04)}
+.threads a.on{color:var(--ink);background:rgba(240,226,204,.04)}
+.rail .foot{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;font-size:13px;color:var(--ink-2)}
+.sw{width:28px;height:16px;border-radius:999px;background:var(--raised);border:1px solid var(--line-2);position:relative}
+.sw:after{content:"";position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:50%;background:var(--ink-3)}
+.me{display:flex;align-items:center;gap:9px;padding:6px 8px;font-size:13px}
+.me i{width:22px;height:22px;border-radius:50%;background:#3A322A;display:grid;place-items:center;font-style:normal;font-size:10.5px;color:var(--ink);font-weight:500}
+
+/* main panel */
+.main{margin:8px 8px 8px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.view{display:none;flex:1;min-height:0}
+.view.on{display:flex}
+.vhead{display:flex;align-items:center;gap:14px;height:52px;padding:0 20px;border-bottom:1px solid var(--line);flex:none}
+.vhead h1{font-size:14.5px;font-weight:500;letter-spacing:-.005em}
+.vhead .crumb{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.vhead .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 9px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--ink-2);white-space:nowrap}
+.chip b{color:var(--ink);font-weight:500}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;gap:2px}
+.seg button{height:24px;padding:0 10px;border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.seg button.on{background:var(--raised);color:var(--ink)}
+.ibtn{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--ink-3)}
+.ibtn:hover{background:rgba(240,226,204,.05);color:var(--ink)}
+.scroll{overflow:auto;min-height:0;flex:1}
+
+/* ---------- CHAT ---------- */
+#v-chat{flex-direction:row}
+.convo{flex:1;display:flex;flex-direction:column;min-width:0}
+.msgs{flex:1;overflow:auto;padding:28px 24px 12px}
+.col{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--ink-4);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--line)}
+.m{display:grid;grid-template-columns:28px 1fr;gap:12px}
+.m .av{width:26px;height:26px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;background:var(--bg-2)}
+.m .who{display:flex;gap:8px;align-items:baseline;margin-bottom:6px;font-size:13px}
+.m .who b{font-weight:500}
+.m .who span{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+.m .txt{font-size:14.5px;line-height:1.6;color:var(--ink)}
+.m .txt p+p{margin-top:10px}
+.m .txt .hl{color:var(--accent)}
+.u{align-self:flex-end;max-width:76%;background:var(--raised);border:1px solid var(--line);border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:14.5px}
+.u-meta{align-self:flex-end;font-family:var(--mono);font-size:10.5px;color:var(--ink-4);margin-top:-16px}
+.steps{display:flex;align-items:center;gap:6px 8px;font-size:12.5px;color:var(--ink-3);margin-bottom:10px;flex-wrap:wrap}
+.steps>*{white-space:nowrap}
+.steps .ok{color:var(--social)}
+.steps .src{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-radius:4px;padding:0 6px;color:var(--ink-3)}
+
+.nudgecard{border:1px solid rgba(242,166,73,.28);border-radius:12px;background:linear-gradient(180deg,rgba(242,166,73,.07),rgba(242,166,73,.015));padding:14px 16px}
+.nudgecard .h{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--accent);margin-bottom:6px}
+.nudgecard .t{font-size:15px;line-height:1.5}
+.nudgecard .acts{display:flex;gap:6px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.nudgecard .res{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.pill{height:28px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);font-size:12.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pill:hover{border-color:var(--line-3);color:var(--ink)}
+.pill.pri{background:var(--ink);color:#16120E;border-color:var(--ink);font-weight:500}
+.pill.acc{background:var(--accent);color:#1A1208;border-color:var(--accent);font-weight:500}
+.pill.dim{opacity:.5}
+
+.dcard{border:1px solid var(--line-2);border-radius:12px;background:var(--bg-2);margin:12px 0 4px;overflow:hidden}
+.dcard .top{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px 6px;gap:12px}
+.dcard .top .k{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.dcard .top .v{font-size:30px;font-weight:300;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums;margin-top:4px;color:var(--ink)}
+.dcard .top .v small{font-size:13px;color:var(--ink-3);margin-left:2px;letter-spacing:0}
+.delta{font-family:var(--mono);font-size:11px;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.delta.bad{color:#E58B7C;background:rgba(194,82,63,.14)}
+.delta.good{color:#6CC7AF;background:rgba(46,158,134,.14)}
+.delta.neu{color:var(--ink-2);background:rgba(240,226,204,.06)}
+.dcard svg{display:block;width:100%}
+.dcard .rows{border-top:1px solid var(--line)}
+.dcard .row{display:grid;grid-template-columns:110px 1fr auto;gap:12px;padding:9px 16px;border-bottom:1px solid var(--line);font-size:13px;align-items:center}
+.dcard .row:last-child{border-bottom:0}
+.dcard .row .t{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.dcard .row .n{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.dcard .foot{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 9px 16px;border-top:1px solid var(--line);background:rgba(240,226,204,.015)}
+.dcard .foot span{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+.dcard .foot .pill{height:26px;font-size:12px}
+.strip2{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line-2);border-radius:12px;margin:12px 0 4px;background:var(--bg-2)}
+.strip2>div{padding:12px 16px}
+.strip2>div+div{border-left:1px solid var(--line)}
+.strip2 .v{font-size:24px;font-weight:300;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-top:4px}
+.strip2 .v small{font-size:12px;color:var(--ink-3);letter-spacing:0;margin-left:4px;font-family:var(--mono)}
+.strip2 svg{display:block;width:100%;height:28px;margin-top:6px}
+
+.prop{border:1px solid var(--line-2);border-radius:12px;background:var(--bg-2);margin:12px 0 4px}
+.prop .ph{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.prop .ph b{font-weight:500;font-size:14px;display:flex;align-items:center;gap:9px}
+.prop .ph .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--accent);display:flex;align-items:center;gap:6px}
+.prop .ph .tag:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.prop .kv{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 16px;font-size:13.5px;border-bottom:1px solid var(--line)}
+.prop .kv span:first-child{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:2px}
+.prop .kv s{color:var(--ink-4)}
+.prop .quote{border-left:2px solid var(--line-3);padding-left:10px;color:var(--ink-2)}
+.prop .meters{display:flex;gap:22px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.prop .meters div{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3)}
+.pips{display:inline-flex;gap:3px}
+.pips i{width:5px;height:5px;border-radius:50%;background:var(--ink-4)}
+.pips i.f{background:var(--ink-2)}
+.prop .pa{display:flex;align-items:center;gap:6px;padding:10px 12px 10px 16px}
+.prop .pa .sp{flex:1;font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+.prop.done .pa{display:none}
+.prop .ok{display:none;padding:10px 16px;font-family:var(--mono);font-size:11.5px;color:#6CC7AF}
+.prop.done .ok{display:block}
+.prop.done .ph .tag{color:#6CC7AF}.prop.done .ph .tag:before{background:#6CC7AF;box-shadow:0 0 0 3px rgba(46,158,134,.15)}
+
+.auto{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);border:1px dashed var(--line-2);border-radius:10px;padding:9px 12px;margin-top:10px}
+.auto .ck{width:18px;height:18px;border-radius:50%;background:rgba(46,158,134,.16);display:grid;place-items:center;color:#6CC7AF;flex:none}
+.auto .u2{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.sugg{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-left:40px}
+.sugg button{display:flex;gap:10px;width:100%;text-align:left;padding:10px 14px;font-size:13.5px;color:var(--ink-2);border-bottom:1px solid var(--line)}
+.sugg button:last-child{border-bottom:0}
+.sugg button:hover{background:rgba(240,226,204,.03);color:var(--ink)}
+.sugg button span:first-child{font-family:var(--mono);color:var(--ink-4)}
+
+.composer{padding:10px 24px 16px;flex:none}
+.cbox{max-width:700px;margin:0 auto;border:1px solid var(--line-2);border-radius:14px;background:var(--bg-2);padding:12px 12px 10px 14px}
+.cbox:focus-within{border-color:rgba(242,166,73,.45)}
+.cbox textarea{width:100%;background:transparent;border:0;outline:0;resize:none;color:var(--ink);font:inherit;font-size:14.5px;height:44px}
+.cbox textarea::placeholder{color:var(--ink-4)}
+.cbox .bar{display:flex;align-items:center;gap:6px}
+.cbox .bar .pill{height:26px;font-size:12px;color:var(--ink-3)}
+.cbox .send{margin-left:auto;display:flex;gap:6px;align-items:center}
+.cbox .go{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#1A1208;display:grid;place-items:center}
+.fine{max-width:700px;margin:8px auto 0;text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+
+.ctx{width:300px;border-left:1px solid var(--line);flex:none;display:flex;flex-direction:column;overflow:auto}
+.ctx section{padding:16px 18px;border-bottom:1px solid var(--line)}
+.ctx .gauge{display:flex;align-items:center;gap:16px;margin-top:12px}
+.ctx .gauge svg{width:92px;height:92px;flex:none}
+.ctx .gauge .v{font-size:34px;font-weight:300;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.ctx .gauge .v small{font-size:12px;color:var(--ink-3);letter-spacing:0;font-family:var(--mono)}
+.ctx .gauge p{font-size:12.5px;color:var(--ink-2);margin-top:6px;line-height:1.45}
+.ctx .mrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid var(--line)}
+.ctx .mrow:last-child{border-bottom:0}
+.ctx .mrow span:first-child{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+.ctx .mrow .mono{font-size:12px}
+.daystrip{display:flex;height:10px;gap:2px;margin-top:12px}
+.daystrip i{display:block;height:100%;border-radius:2px}
+.dsaxis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-4);margin-top:5px}
+.mom{display:grid;grid-template-columns:40px 1fr;gap:8px;padding:6px 0;font-size:12.5px;color:var(--ink-2)}
+.mom .t{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);padding-top:2px}
+
+/* ---------- TODAY ---------- */
+.pad{padding:24px 24px 40px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{border:1px solid var(--line);border-radius:12px;background:var(--bg-2);padding:16px 18px;display:flex;flex-direction:column;min-width:0}
+.tile .th{display:flex;align-items:center;justify-content:space-between}
+.tile .th .k{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.tile .big{font-size:48px;font-weight:300;letter-spacing:-.045em;line-height:1;margin-top:16px;font-variant-numeric:tabular-nums}
+.tile .big small{font-size:14px;color:var(--ink-3);letter-spacing:0;margin-left:3px;font-family:var(--mono)}
+.tile .cmp{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12.5px;color:var(--ink-3)}
+.tile svg{display:block;width:100%;margin-top:14px}
+.tile .lg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin:8px 0 14px}
+.tile .lg i{width:14px;border-top:1px dashed rgba(240,226,204,.5)}
+.tile .note{font-size:12.5px;color:var(--ink-3);margin-top:auto;border-top:1px solid var(--line);padding-top:10px;line-height:1.45}
+.tile .note b{color:var(--ink-2);font-weight:500}
+.cardx{border:1px solid var(--line);border-radius:12px;background:var(--bg-2);margin-top:12px}
+.cardx .ch{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cardx .ch h3{font-size:14px;font-weight:500}
+.cardx .ch .sub{font-size:12.5px;color:var(--ink-3)}
+.cardx .ch .right{margin-left:auto;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+.legend span b{font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--ink)}
+.chartwrap{position:relative;padding:12px 18px 14px}
+.chartwrap svg{display:block;width:100%;overflow:visible}
+.ax{font-family:var(--mono);font-size:10px;fill:#6A6157}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:12px}
+.grid2 .cardx{margin-top:0}
+.log{max-height:none}
+.log .lr{display:grid;grid-template-columns:3px 52px 76px 1fr;gap:12px;align-items:center;padding:9px 18px;border-bottom:1px solid var(--line);font-size:13px}
+.log .lr:last-child{border-bottom:0}
+.log .lr>i{height:18px;border-radius:2px;display:block}
+.log .lr .t{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.log .lr .ty{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:0 6px;justify-self:start}
+.log .lr span:last-child{color:var(--ink-2);min-width:0}
+.nlist .nr{display:grid;grid-template-columns:52px 1fr auto;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);font-size:13px;align-items:start}
+.nlist .nr:last-child{border-bottom:0}
+.nlist .nr .t{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:1px}
+.nlist .nr p{color:var(--ink-2);line-height:1.45}
+.st{font-family:var(--mono);font-size:10.5px;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.st.ok{color:#6CC7AF;background:rgba(46,158,134,.12)}
+.st.no{color:var(--ink-3);background:rgba(240,226,204,.05)}
+.st.wait{color:var(--accent);background:var(--accent-dim)}
+
+#tip{position:fixed;z-index:50;pointer-events:none;background:#2C2620;border:1px solid var(--line-3);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.45;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .12s;max-width:240px}
+#tip .tt{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+#tip .tv{display:flex;align-items:center;gap:7px}
+
+/* ---------- PATTERNS ---------- */
+.olegend{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.olegend>div{padding:14px 18px;border-left:1px solid var(--line)}
+.olegend>div:first-child{border-left:0}
+.olegend .k{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.olegend .v{font-size:24px;font-weight:300;letter-spacing:-.03em;margin-top:4px;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px}
+.olegend .v small{font-size:12px;color:var(--ink-3);letter-spacing:0;font-family:var(--mono)}
+.find{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.find .f{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--bg-2)}
+.find .f .label{color:var(--accent)}
+.find .f h4{font-size:15px;font-weight:500;line-height:1.35;margin-top:10px;letter-spacing:-.005em}
+.find .f p{font-size:12.5px;color:var(--ink-3);margin-top:8px;line-height:1.5}
+.find .f .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);margin-top:12px}
+
+/* ---------- PEOPLE ---------- */
+.ptable{width:100%;border-collapse:collapse;font-size:13px}
+.ptable th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:400;padding:10px 18px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ptable td{padding:10px 18px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.ptable tr:hover td{background:rgba(240,226,204,.02)}
+.ptable .who{display:flex;align-items:center;gap:10px}
+.ptable .who i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10.5px;font-weight:500;background:#3A322A}
+.ptable .who small{display:block;color:var(--ink-3);font-size:11.5px}
+.en{display:inline-flex;align-items:center;gap:7px}
+.dv{display:flex;align-items:center;gap:10px}
+.dv .tr{position:relative;width:140px;height:8px}
+.dv .tr:before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--line-3)}
+.dv .tr b{position:absolute;top:0;height:8px;border-radius:2px}
+.dv .mono{width:30px;text-align:right;font-size:12px}
+.tfoot{display:flex;justify-content:space-between;padding:10px 18px;font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+.ovx{overflow-x:auto}
+
+/* mobile */
+.mtop{display:none}
+@media (max-width:1180px){.ctx{display:none}}
+@media (max-width:900px){
+  body{overflow:auto}
+  .app{grid-template-columns:1fr;height:auto;min-height:100vh}
+  .rail{display:none}
+  .mtop{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:10;overflow-x:auto}
+  .mtop .b{font-weight:500;margin-right:8px;display:flex;align-items:center;gap:8px}
+  .mtop a{font-size:13px;padding:6px 10px;border-radius:7px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+  .mtop a.on{background:var(--raised);color:var(--ink)}
+  .main{margin:0;border:0;border-radius:0;overflow:visible}
+  .view{flex-direction:column}
+  .vhead{padding:0 14px;height:auto;min-height:48px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+  .vhead .right .chip:not(.keep){display:none}
+  .msgs{padding:18px 14px 8px;overflow:visible}
+  .composer{padding:8px 12px 14px;position:sticky;bottom:0;background:var(--panel)}
+  .sugg{margin-left:0}
+  .u{max-width:88%}
+  .dcard .row{grid-template-columns:86px 1fr auto}
+  .pad{padding:14px 12px 28px}
+  .grid3,.grid2,.find{grid-template-columns:1fr}
+  .olegend{grid-template-columns:1fr 1fr}
+  .olegend>div:nth-child(3){border-left:0}
+  .olegend>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .scroll{overflow:visible}
+  .log .lr{grid-template-columns:3px 44px 1fr}.log .lr .ty{display:none}
+  .prop .kv{grid-template-columns:72px 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><svg width="20" height="20" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9.5" fill="none" stroke="#EFE7DA" stroke-width="1.4"/><circle cx="11" cy="11" r="5.5" fill="none" stroke="#EFE7DA" stroke-opacity=".35"/><circle cx="11" cy="4.2" r="1.6" fill="#F2A649"/></svg>mind<span class="sp kbd">⌘K</span></div>
+    <div class="device"><span class="p"></span><b>Pendant · listening</b><span>64% · synced 22:19</span></div>
+    <nav class="nav">
+      <a data-go="today"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.2 1.6"/></svg>Today<span class="kbd">T</span></a>
+      <a data-go="chat" class="on"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2.5 4.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H7l-3 2.2v-2.2h0a2 2 0 0 1-1.5-2z"/></svg>Chat<span class="badge">1</span></a>
+      <a data-go="patterns"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 12.5l3.5-4 3 2.5L14 4"/><path d="M2 14h12" stroke-opacity=".5"/></svg>Patterns<span class="kbd">P</span></a>
+      <a data-go="people"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="6" r="2.5"/><path d="M1.8 13.5c.6-2.3 2.2-3.5 4.2-3.5s3.6 1.2 4.2 3.5"/><circle cx="11.5" cy="5.5" r="2"/><path d="M11 9.6c1.6.1 2.7 1.2 3.2 3"/></svg>People<span class="kbd">E</span></a>
+    </nav>
+    <h5>Threads</h5>
+    <div class="threads">
+      <a class="on" data-go="chat"><span>Tonight: how bad was today</span><span>22:14</span></a>
+      <a><span>Prep for 1:1 with Sam</span><span>15:44</span></a>
+      <a><span>Lunch notes, Priya &amp; Jonah</span><span>13:05</span></a>
+      <a><span>Why am I flat on Thursdays?</span><span>Wed</span></a>
+      <a><span>Saturday sidequest ideas</span><span>Tue</span></a>
+      <a><span>Reply to Dana about brunch</span><span>Tue</span></a>
+      <a><span>Phone-out-of-bedroom streak</span><span>Mon</span></a>
+      <a><span>Lisbon trip, what I promised</span><span>9 Nov</span></a>
+    </div>
+    <div class="foot">
+      <div class="toggle"><span>Go dark</span><span class="sw" aria-label="Pendant listening is on"></span></div>
+      <div class="me"><i>AR</i>Alex Rivera<span class="kbd" style="margin-left:auto">⚙</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mtop">
+      <span class="b"><svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9.5" fill="none" stroke="#EFE7DA" stroke-width="1.4"/><circle cx="11" cy="4.2" r="1.6" fill="#F2A649"/></svg>mind</span>
+      <a data-go="today">Today</a><a data-go="chat" class="on">Chat</a><a data-go="patterns">Patterns</a><a data-go="people">People</a>
+    </div>
+
+    <!-- CHAT -->
+    <section class="view on" id="v-chat">
+      <div class="convo">
+        <div class="vhead">
+          <h1>Tonight: how bad was today</h1><span class="crumb">Thu 12 Nov</span>
+          <div class="right">
+            <span class="chip keep"><span class="dot" style="background:var(--accent)"></span>Clarity <b>68</b></span>
+            <span class="chip"><span class="dot" style="background:var(--drift)"></span>Drift <b>2h 14m</b></span>
+            <button class="ibtn" aria-label="More"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3.5" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="12.5" cy="8" r="1.2"/></svg></button>
+          </div>
+        </div>
+        <div class="msgs">
+          <div class="col">
+            <div class="divider">THURSDAY · 21:42</div>
+
+            <div class="m">
+              <div class="av"><svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#EFE7DA" stroke-width="1.6"/><circle cx="11" cy="4.4" r="2" fill="#F2A649"/></svg></div>
+              <div>
+                <div class="who"><b>Mind</b><span>nudge · haptic tap</span></div>
+                <div class="nudgecard">
+                  <div class="h"><span>DRIFT · 52 MIN ON TIKTOK</span><span>21:42</span></div>
+                  <div class="t">You've been on TikTok for 52 minutes. Want to finish the chapter you started Tuesday? You're on page 112.</div>
+                  <div class="acts"><span class="pill dim">Open Kindle</span><span class="pill dim">Ten more minutes</span><span class="res">No response · 28 more min</span></div>
+                </div>
+              </div>
+            </div>
+
+                        <div class="u">ok I'm back. how bad was today, honestly</div>
+            <div class="u-meta">22:14</div>
+
+            <div class="m">
+              <div class="av"><svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#EFE7DA" stroke-width="1.6"/><circle cx="11" cy="4.4" r="2" fill="#F2A649"/></svg></div>
+              <div>
+                <div class="who"><b>Mind</b><span>22:14</span></div>
+                <div class="steps"><span class="ok">✓</span><span>Read 15h of your day</span><span class="src">pendant</span><span class="src">screen time</span><span class="src">calendar</span></div>
+                <div class="txt"><p>Honestly? A good day with a rough last hour and a half. Most of the drift was in one block, in bed.</p></div>
+
+                <div class="dcard">
+                  <div class="top">
+                    <div><div class="k"><span class="dot" style="background:var(--drift)"></span>Drift today</div><div class="v">2h 14<small>m</small></div></div>
+                    <span class="delta bad">+38m vs Thu avg</span>
+                  </div>
+                  <svg id="driftbars" viewBox="0 0 660 124" aria-label="Drift minutes per hour, 06:00 to 23:00"></svg>
+                  <div class="rows">
+                    <div class="row"><span class="t">21:00–22:20</span><span>TikTok, in bed</span><span class="n">80m</span></div>
+                    <div class="row"><span class="t">06:48–07:12</span><span>Phone before getting up</span><span class="n">24m</span></div>
+                    <div class="row"><span class="t">11:36–15:48</span><span>Two short slips between meetings</span><span class="n">30m</span></div>
+                  </div>
+                  <div class="foot"><span>MIN PER HOUR · PENDANT + SCREEN TIME</span><button class="pill" data-go="today">Open in Today →</button></div>
+                </div>
+
+                <div class="txt" style="margin-top:14px"><p>The good part: <span class="hl">10:40 was your clearest hour this week.</span> It came right after the walk with no podcast. And lunch with Priya and Jonah gave back more than it took.</p></div>
+                <div class="strip2">
+                  <div><span class="label">Clarity peak</span><div class="v">86<small>10:40</small></div><svg id="sp1" viewBox="0 0 200 28" preserveAspectRatio="none"></svg></div>
+                  <div><span class="label">Social energy</span><div class="v">+18<small>net today</small></div><svg id="sp2" viewBox="0 0 200 28" preserveAspectRatio="none"></svg></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="u">ugh. ok. can you move my 9am with Sam? I need the morning</div>
+            <div class="u-meta">22:16</div>
+
+            <div class="m">
+              <div class="av"><svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#EFE7DA" stroke-width="1.6"/><circle cx="11" cy="4.4" r="2" fill="#F2A649"/></svg></div>
+              <div>
+                <div class="who"><b>Mind</b><span>22:16</span></div>
+                <div class="txt"><p>Sam's free at 11:30 and 14:00. 11:30 keeps your morning focus block whole, and you told him you'd have the Q1 numbers. I drafted a note.</p></div>
+                <div class="prop" id="prop">
+                  <div class="ph"><b><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>Move 1:1 with Sam Okafor</b><span class="tag">NEEDS YOUR YES</span></div>
+                  <div class="kv"><span>When</span><span><s class="mono">Fri 09:00</s> <span class="mono" style="color:var(--ink-3)">→</span> <span class="mono">Fri 11:30</span> <span style="color:var(--ink-3)">· 30 min</span></span></div>
+                  <div class="kv"><span>Message</span><span class="quote">"Mind if we push to 11:30? I want to come in with the budget numbers done."</span></div>
+                  <div class="meters">
+                    <div>Reversible <span class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></span></div>
+                    <div>Seen by others <span class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></span></div>
+                    <div>Cost <span class="pips"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  </div>
+                  <div class="pa"><span class="sp">via Google Calendar · Slack</span><button class="pill">Discard</button><button class="pill">Edit message</button><button class="pill acc" onclick="document.getElementById('prop').classList.add('done');document.querySelector('#prop .tag').textContent='SENT 22:17'">Approve &amp; send</button></div>
+                  <div class="ok">✓ Moved to Fri 11:30. Sam has the note. Undo within 10 min.</div>
+                </div>
+                <div class="auto"><span class="ck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 5.2l2 2L8 3"/></svg></span><span>Did without asking: Do Not Disturb until 08:30. <span style="color:var(--ink-3)">Low risk, only you see it.</span></span><span class="u2">Undo</span></div>
+              </div>
+            </div>
+
+            <div class="sugg">
+              <button><span>↳</span><span>Put my phone on the kitchen charger at 22:45</span></button>
+              <button><span>↳</span><span>Plan tomorrow's first 90 minutes</span></button>
+              <button><span>↳</span><span>Why do I drift after dinner on weeknights?</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="cbox">
+            <textarea placeholder="Ask Mind, or tell it what to do…" aria-label="Message Mind"></textarea>
+            <div class="bar">
+              <button class="pill">+ Moment</button><button class="pill">@ Person</button><button class="pill">Today ▾</button>
+              <div class="send">
+                <button class="ibtn" aria-label="Voice"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="5.5" y="1.5" width="5" height="8.5" rx="2.5"/><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5v2"/></svg></button>
+                <button class="go" aria-label="Send"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 12V2M3 6l4-4 4 4"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <p class="fine">Mind can act for you. Anything another person will see waits for your approval.</p>
+        </div>
+      </div>
+
+      <aside class="ctx">
+        <section>
+          <div class="label">Now · 22:20</div>
+          <div class="gauge">
+            <svg id="g1" viewBox="-50 -50 100 100"></svg>
+            <div><div class="v">68<small> /100</small></div><p>Clarity. Drifting for 1h 20m. Usually you recover after a page or two of reading.</p></div>
+          </div>
+        </section>
+        <section>
+          <div class="label">Today so far</div>
+          <div class="daystrip" id="ds"></div>
+          <div class="dsaxis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+          <div style="margin-top:12px">
+            <div class="mrow"><span><i class="dot" style="background:var(--focus)"></i>Focus</span><span class="mono">6h 36m</span></div>
+            <div class="mrow"><span><i class="dot" style="background:var(--social)"></i>Social</span><span class="mono">4h 48m</span></div>
+            <div class="mrow"><span><i class="dot" style="background:var(--drift)"></i>Drift</span><span class="mono">2h 14m</span></div>
+            <div class="mrow"><span><i class="dot" style="background:var(--rest)"></i>Rest</span><span class="mono">8h 42m</span></div>
+          </div>
+        </section>
+        <section>
+          <div class="label" style="margin-bottom:6px">Moments it kept</div>
+          <div class="mom"><span class="t">16:12</span><span>Sam: "Can we see Q1 numbers before Lisbon?"</span></div>
+          <div class="mom"><span class="t">12:40</span><span>Priya recommended <i>The Overstory</i>. Third person this month.</span></div>
+          <div class="mom"><span class="t">10:40</span><span>Clarity 86 after the 25 min walk. Best this week.</span></div>
+        </section>
+      </aside>
+    </section>
+
+    <!-- TODAY -->
+    <section class="view" id="v-today" style="flex-direction:column">
+      <div class="vhead">
+        <h1>Thursday, 12 November</h1><span class="crumb">● LIVE 22:20</span>
+        <div class="right"><div class="seg"><button>Yesterday</button><button class="on">Today</button></div></div>
+      </div>
+      <div class="scroll"><div class="pad">
+        <div class="grid3">
+          <div class="tile">
+            <div class="th"><span class="k"><span class="dot" style="background:var(--accent)"></span>Clarity</span><span class="label">0–100</span></div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+              <div><div class="big">68</div><div class="cmp"><span class="delta neu">−3 vs 7-day avg</span></div></div>
+              <svg id="g2" viewBox="-50 -50 100 100" style="width:84px;height:84px;margin:0"></svg>
+            </div>
+            <svg id="clar7" viewBox="0 0 300 70"></svg><div class="lg"><i></i>7-day avg 71</div>
+            <div class="note"><b>Peak 86 at 10:40</b>, after a 25-minute walk. Lowest 41 at 06:50, phone in bed.</div>
+          </div>
+          <div class="tile">
+            <div class="th"><span class="k"><span class="dot" style="background:var(--drift)"></span>Drift</span><span class="label">hours</span></div>
+            <div class="big">2h 14<small>m</small></div>
+            <div class="cmp"><span class="delta bad">+38m vs 7-day avg</span></div>
+            <svg id="drift7" viewBox="0 0 300 86"></svg><div class="lg"><i></i>7-day avg 1h 36m</div>
+            <div class="note"><b>80 of 134 minutes</b> were 21:00–22:20, TikTok, in bed.</div>
+          </div>
+          <div class="tile">
+            <div class="th"><span class="k"><span class="dot" style="background:var(--social)"></span>Social energy</span><span class="label">Δ clarity pts</span></div>
+            <div class="big">+18</div>
+            <div class="cmp"><span class="delta good">+9 vs 7-day avg</span></div>
+            <div id="soc" style="margin:14px 0 14px"></div>
+            <div class="note"><b>Restored by</b> lunch with Priya and Jonah. The 1:1 with Sam cost a little.</div>
+          </div>
+        </div>
+
+        <div class="cardx">
+          <div class="ch">
+            <h3>Day timeline</h3><span class="sub">State by minute, clarity overlaid</span>
+            <div class="right legend">
+              <span><i class="dot" style="background:var(--focus)"></i>Focus <b>6h 36m</b></span>
+              <span><i class="dot" style="background:var(--social)"></i>Social <b>4h 48m</b></span>
+              <span><i class="dot" style="background:var(--drift)"></i>Drift <b>2h 14m</b></span>
+              <span><i class="dot" style="background:var(--rest)"></i>Rest <b>8h 42m</b></span>
+              <span><svg width="16" height="8"><line x1="0" y1="4" x2="16" y2="4" stroke="#EFE7DA" stroke-width="1.5"/></svg>Clarity</span>
+            </div>
+          </div>
+          <div class="chartwrap"><svg id="timeline" viewBox="0 0 1100 230"></svg></div>
+        </div>
+
+        <div class="grid2">
+          <div class="cardx log">
+            <div class="ch"><h3>Moments</h3><span class="sub">What it heard and noticed</span></div>
+            <div class="lr"><i style="background:var(--drift)"></i><span class="t">21:00</span><span class="ty">state</span><span>Switched to drift. TikTok, lying down, lights low.</span></div>
+            <div class="lr"><i style="background:var(--social)"></i><span class="t">19:12</span><span class="ty">people</span><span>Dinner with Maya. You laughed 14 times. Clarity +7 after.</span></div>
+            <div class="lr"><i style="background:var(--social)"></i><span class="t">16:12</span><span class="ty">promise</span><span>Told Sam: "I'll have Q1 numbers by Thursday."</span></div>
+            <div class="lr"><i style="background:var(--focus)"></i><span class="t">13:00</span><span class="ty">state</span><span>Deep work, 2h 30m. Longest unbroken block since Monday.</span></div>
+            <div class="lr"><i style="background:var(--social)"></i><span class="t">12:40</span><span class="ty">interest</span><span>Priya recommended <i>The Overstory</i>. Third time this month.</span></div>
+            <div class="lr"><i style="background:var(--rest)"></i><span class="t">08:00</span><span class="ty">habit</span><span>Walk, no headphones. 25 minutes.</span></div>
+          </div>
+          <div class="cardx nlist">
+            <div class="ch"><h3>Nudges &amp; actions</h3><span class="sub">4 nudges · 3 actions</span></div>
+            <div class="nr"><span class="t">22:16</span><p>Move Fri 1:1 with Sam to 11:30 and send note</p><span class="st wait">awaiting</span></div>
+            <div class="nr"><span class="t">22:16</span><p>Do Not Disturb until 08:30</p><span class="st ok">auto</span></div>
+            <div class="nr"><span class="t">21:42</span><p>"Want to finish the chapter you started Tuesday?"</p><span class="st no">ignored</span></div>
+            <div class="nr"><span class="t">15:52</span><p>"Sam will ask about the budget. Want Tuesday's sheet?"</p><span class="st ok">opened</span></div>
+            <div class="nr"><span class="t">11:34</span><p>"Ten minutes until lunch. Close the laptop now and walk?"</p><span class="st ok">taken</span></div>
+            <div class="nr"><span class="t">07:05</span><p>"Phone down. Kettle's that way."</p><span class="st ok">taken</span></div>
+          </div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- PATTERNS -->
+    <section class="view" id="v-patterns" style="flex-direction:column">
+      <div class="vhead">
+        <h1>Patterns</h1><span class="crumb">14 Oct – 12 Nov · 30 days</span>
+        <div class="right"><div class="seg"><button>1W</button><button class="on">1M</button><button>3M</button><button>1Y</button></div></div>
+      </div>
+      <div class="scroll"><div class="pad">
+        <div class="cardx" style="margin-top:0">
+          <div class="olegend">
+            <div><div class="k"><span class="dot" style="background:var(--accent)"></span>Clarity, daily avg</div><div class="v">71<span class="delta good">+4</span></div></div>
+            <div><div class="k"><span class="dot" style="background:var(--drift)"></span>Drift per day</div><div class="v">1h 52m<span class="delta good">−12m</span></div></div>
+            <div><div class="k"><span class="dot" style="background:var(--focus)"></span>Focus per day</div><div class="v">5h 10m<span class="delta good">+22m</span></div></div>
+            <div><div class="k"><span class="dot" style="background:var(--social)"></span>Social energy</div><div class="v">+9<small>/ day</small></div></div>
+          </div>
+          <div class="ch" style="border-bottom:0;padding-bottom:0"><h3>Clarity</h3><span class="sub">Daily average, 0–100. Dashed line: your 30-day average (71).</span></div>
+          <div class="chartwrap"><svg id="pline" viewBox="0 0 1100 250"></svg></div>
+        </div>
+        <div class="grid2">
+          <div class="cardx">
+            <div class="ch"><h3>When you drift</h3><span class="sub">Avg drift minutes, by weekday and hour</span></div>
+            <div class="chartwrap"><svg id="heat" viewBox="0 0 640 230"></svg></div>
+          </div>
+          <div class="cardx">
+            <div class="ch"><h3>Where the waking hours went</h3><span class="sub">Last 7 days, hours</span></div>
+            <div class="chartwrap"><svg id="stack" viewBox="0 0 460 230"></svg></div>
+          </div>
+        </div>
+        <div class="find">
+          <div class="f"><span class="label">Finding · strong</span><h4>Drift after 21:00 is 3.1× higher when your phone charges in the bedroom.</h4><p>11 of 14 nights with the phone in the kitchen stayed under 20 minutes.</p><div class="n">n = 30 nights · confidence high</div></div>
+          <div class="f"><span class="label">Finding · moderate</span><h4>Your clearest hours follow walks without audio.</h4><p>Average clarity 81 in the 90 minutes after, vs 69 after walks with a podcast.</p><div class="n">n = 17 walks · confidence moderate</div></div>
+          <div class="f"><span class="label">Finding · early</span><h4>Thursdays run 6 points flatter than the rest of your week.</h4><p>Three back-to-back meetings, every Thursday since October. Want to look at moving one?</p><div class="n">n = 4 Thursdays · keep watching</div></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- PEOPLE -->
+    <section class="view" id="v-people" style="flex-direction:column">
+      <div class="vhead">
+        <h1>People</h1><span class="crumb">Sorted by effect on clarity</span>
+        <div class="right"><div class="seg"><button>7D</button><button class="on">30D</button><button>90D</button></div></div>
+      </div>
+      <div class="scroll"><div class="pad">
+        <div class="grid3" style="margin-bottom:12px">
+          <div class="tile"><div class="th"><span class="k"><span class="dot" style="background:var(--social)"></span>Most restoring</span></div><div class="big" style="font-size:34px">Maya</div><div class="cmp"><span class="delta good">+14 clarity</span>in the hour after, 30d avg</div></div>
+          <div class="tile"><div class="th"><span class="k"><span class="dot" style="background:var(--drift)"></span>Most draining</span></div><div class="big" style="font-size:34px">Family chat</div><div class="cmp"><span class="delta bad">−11 clarity</span>mostly late-night threads</div></div>
+          <div class="tile"><div class="th"><span class="k"><span class="dot" style="background:var(--accent)"></span>Overdue</span></div><div class="big" style="font-size:34px">Jonah, Dana</div><div class="cmp"><span class="delta neu">2 open promises</span>last real talk 6 and 19 days ago</div></div>
+        </div>
+        <div class="cardx" style="margin-top:0">
+          <div class="ovx">
+          <table class="ptable" id="ptable">
+            <thead><tr><th>Person</th><th>Energy</th><th>Effect on clarity</th><th style="text-align:right">Together · 30d</th><th>Last together</th><th>Open promises</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          </div>
+          <div class="tfoot"><span>9 PEOPLE · 61H OF CONVERSATION</span><span>EFFECT = CLARITY CHANGE IN THE HOUR AFTER, AVERAGED</span></div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+</div>
+<div id="tip"></div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const C={focus:'#C78428',social:'#2E9E86',drift:'#C2523F',rest:'#7085D6',accent:'#F2A649'};
+const NAME={focus:'Focus',social:'Social',drift:'Drift',rest:'Rest'};
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+const txt=(p,x,y,s,a)=>{const t=el('text',Object.assign({x,y,class:'ax'},a||{}),p);t.textContent=s;return t;};
+const fmtH=h=>{const hh=Math.floor(h),mm=Math.round((h-hh)*60);return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');};
+const dur=h=>{const m=Math.round(h*60);return (m>=60?Math.floor(m/60)+'h ':'')+(m%60)+'m';};
+const tip=document.getElementById('tip');
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;const x=Math.min(e.clientX+14,innerWidth-250);tip.style.left=x+'px';tip.style.top=(e.clientY+14)+'px';}
+function hideTip(){tip.style.opacity=0;}
+
+const day=[[0,6.8,'rest','Asleep'],[6.8,7.2,'drift','Phone in bed'],[7.2,8.0,'social','Coffee with Maya'],[8.0,9.0,'rest','Walk, no headphones'],[9.0,11.6,'focus','Budget model'],[11.6,11.8,'drift','Slack, then news'],[11.8,13.0,'social','Lunch, Priya and Jonah'],[13.0,15.5,'focus','Deep work, Q1 numbers'],[15.5,15.8,'drift','Instagram'],[15.8,16.8,'social','1:1 with Sam'],[16.8,18.3,'focus','Writing'],[18.3,19.2,'rest','Cooking'],[19.2,21.0,'social','Dinner with Maya'],[21.0,22.333,'drift','TikTok, in bed']];
+const NOW=22.333;
+function rnd(seed){return()=>{seed=(seed*16807)%2147483647;return seed/2147483647;}}
+const R=rnd(11);
+const clarity=h=>h<6.8?null:h<7.2?42:h<9?50+(h-7.2)*7:h<10.66?63+(h-9)*14:h<11.6?86-(h-10.66)*14:h<13?71:h<15.5?77+Math.sin(h*2.2)*4:h<16.8?63:h<18.3?73:h<21?77:77-(h-21)*7;
+
+/* ---- view switching ---- */
+function go(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  document.querySelectorAll('[data-go]').forEach(a=>{if(a.closest('.nav')||a.closest('.mtop'))a.classList.toggle('on',a.dataset.go===v);});
+  document.title='Mind — '+({chat:'Tonight',today:'Today',patterns:'Patterns',people:'People'})[v];
+  if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);}
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',()=>go(a.dataset.go)));
+document.addEventListener('keydown',e=>{if(e.target.tagName==='TEXTAREA'||e.metaKey||e.ctrlKey)return;const m={t:'today',c:'chat',p:'patterns',e:'people'}[e.key.toLowerCase()];if(m)go(m);});
+document.querySelectorAll('.seg').forEach(s=>s.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;s.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===e.target));}));
+
+/* ---- gauges ---- */
+function gauge(id,v){const s=document.getElementById(id);el('circle',{cx:0,cy:0,r:40,fill:'none',stroke:'rgba(240,226,204,.08)','stroke-width':6},s);
+  const a=-Math.PI/2+Math.PI*2*v/100,x=Math.cos(a)*40,y=Math.sin(a)*40;
+  el('path',{d:`M0 -40 A40 40 0 ${v>50?1:0} 1 ${x.toFixed(2)} ${y.toFixed(2)}`,fill:'none',stroke:C.accent,'stroke-width':6,'stroke-linecap':'round'},s);
+  for(let i=0;i<10;i++){const b=-Math.PI/2+Math.PI*2*i/10;el('line',{x1:Math.cos(b)*30,y1:Math.sin(b)*30,x2:Math.cos(b)*33,y2:Math.sin(b)*33,stroke:'rgba(240,226,204,.2)'},s);}}
+gauge('g1',68);gauge('g2',68);
+
+/* ---- context day strip ---- */
+const ds=document.getElementById('ds');
+day.forEach(([a,b,k,l])=>{const i=document.createElement('i');i.style.flex=(b-a);i.style.background=C[k];i.title=`${fmtH(a)}–${fmtH(b)} ${NAME[k]}: ${l}`;ds.appendChild(i);});
+const fut=document.createElement('i');fut.style.flex=24-NOW;fut.style.background='repeating-linear-gradient(90deg,rgba(240,226,204,.12) 0 2px,transparent 2px 5px)';ds.appendChild(fut);
+
+/* ---- drift bars in chat ---- */
+(function(){const s=document.getElementById('driftbars');const W=660,H=124,L=40,Rr=16,T=22,B=26;
+  const hrs=[];for(let h=6;h<23;h++){let m=0;day.forEach(([a,b,k])=>{if(k!=='drift')return;const o=Math.max(0,Math.min(b,h+1)-Math.max(a,h));m+=o*60;});hrs.push([h,Math.round(m)]);}
+  const max=60,pw=W-L-Rr,bw=pw/hrs.length;
+  [0,30,60].forEach(v=>{const y=T+(H-T-B)*(1-v/max);el('line',{x1:L,x2:W-Rr,y1:y,y2:y,stroke:'rgba(240,226,204,'+(v?'.06':'.16')+')','stroke-dasharray':v?'2 4':''},s);txt(s,L-8,y+3.5,v,{'text-anchor':'end'});});
+  txt(s,L+4,10,'MIN / HOUR');
+  hrs.forEach(([h,m],i)=>{const x=L+i*bw+3,w=bw-6,hh=(H-T-B)*m/max,y=H-B-hh;
+    if(m>0){const r=el('rect',{x,y,width:w,height:Math.max(hh,1.5),rx:2,fill:C.drift,'fill-opacity':h>=21?1:.55},s);
+      r.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${String(h).padStart(2,'0')}:00–${String(h+1).padStart(2,'0')}:00</div><div class="tv"><i class="dot" style="background:${C.drift}"></i>${m} min drift</div>`));r.addEventListener('mouseleave',hideTip);}
+    if(h%3===0)txt(s,x+w/2,H-8,String(h).padStart(2,'0'),{'text-anchor':'middle'});});
+})();
+
+/* ---- sparklines ---- */
+function spark(id,vals,color,lo,hi){const s=document.getElementById(id);const n=vals.length;let d='';vals.forEach((v,i)=>{const x=i/(n-1)*200,y=26-(v-lo)/(hi-lo)*24;d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);});
+  el('path',{d,fill:'none',stroke:color,'stroke-width':1.5,'vector-effect':'non-scaling-stroke'},s);}
+const cl=[];for(let h=6.8;h<=NOW;h+=0.25)cl.push(clarity(h)+(R()-.5)*3);spark('sp1',cl,C.accent,30,95);
+const se=[];for(let h=7;h<=NOW;h+=0.25){se.push(h<7.2?0:h<8?6:h<11.8?6:h<13?6+(h-11.8)*9:h<15.8?17:h<16.8?17-(h-15.8)*4:h<19.2?13:h<21?13+(h-19.2)*3:18);}spark('sp2',se,C.social,-2,22);
+
+/* ---- today: clarity 7 day ---- */
+(function(){const s=document.getElementById('clar7');const days=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'],v=[72,79,75,70,73,74,68],avg=71;const W=300,H=70,L=22,T=6,B=18;
+  const y=x=>T+(H-T-B)*(1-(x-50)/50);
+  [50,100].forEach(g=>{el('line',{x1:L,x2:W,y1:y(g),y2:y(g),stroke:'rgba(240,226,204,.06)'},s);txt(s,L-6,y(g)+3,g,{'text-anchor':'end'});});
+  el('line',{x1:L,x2:W,y1:y(avg),y2:y(avg),stroke:'rgba(240,226,204,.35)','stroke-dasharray':'3 3'},s);
+  let d='';v.forEach((p,i)=>{const x=L+8+i*(W-L-16)/6;d+=(i?'L':'M')+x+' '+y(p);txt(s,x,H-4,days[i],{'text-anchor':'middle'});});
+  el('path',{d,fill:'none',stroke:C.accent,'stroke-width':2,'stroke-linejoin':'round'},s);
+  v.forEach((p,i)=>{const x=L+8+i*(W-L-16)/6;const c=el('circle',{cx:x,cy:y(p),r:i===6?4:2.5,fill:i===6?C.accent:'#1A1612',stroke:C.accent,'stroke-width':1.5},s);
+    const hit=el('rect',{x:x-14,y:0,width:28,height:H-B,fill:'transparent'},s);hit.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${days[i]}</div><div class="tv"><i class="dot" style="background:${C.accent}"></i>Clarity avg ${p}</div>`));hit.addEventListener('mouseleave',hideTip);});
+})();
+
+/* ---- today: drift 7 day bars ---- */
+(function(){const s=document.getElementById('drift7');const days=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'],v=[118,74,142,88,96,80,134],avg=96;const W=300,H=86,L=22,T=6,B=18,max=180;
+  const y=m=>T+(H-T-B)*(1-m/max);
+  [0,60,120,180].forEach(g=>{el('line',{x1:L,x2:W,y1:y(g),y2:y(g),stroke:'rgba(240,226,204,'+(g?'.06':'.16')+')'},s);txt(s,L-6,y(g)+3,g/60+'h',{'text-anchor':'end'});});
+  const bw=(W-L)/7;
+  v.forEach((m,i)=>{const x=L+i*bw+bw*.22,w=bw*.56;const r=el('rect',{x,y:y(m),width:w,height:y(0)-y(m),rx:2,fill:C.drift,'fill-opacity':i===6?1:.45},s);
+    r.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${days[i]}</div><div class="tv"><i class="dot" style="background:${C.drift}"></i>${dur(m/60)} drift</div>`));r.addEventListener('mouseleave',hideTip);
+    txt(s,x+w/2,H-4,days[i],{'text-anchor':'middle'});});
+  el('line',{x1:L,x2:W,y1:y(avg),y2:y(avg),stroke:'rgba(240,226,204,.35)','stroke-dasharray':'3 3'},s);
+})();
+
+/* ---- today: social diverging ---- */
+(function(){const host=document.getElementById('soc');const rows=[['Lunch · Priya, Jonah',11],['Dinner · Maya',7],['Coffee · Maya',6],['1:1 · Sam',-4],['Family chat',-2]];
+  host.innerHTML=rows.map(([n,v])=>`<div class="dv" style="justify-content:space-between;height:24px;font-size:12.5px;color:var(--ink-2)"><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n}</span><span class="tr" style="width:96px"><b style="${v>=0?`left:50%;width:${v/12*50}%;background:${C.social}`:`right:50%;width:${-v/12*50}%;background:${C.drift}`}"></b></span><span class="mono">${v>0?'+':'−'}${Math.abs(v)}</span></div>`).join('')+
+  `<div class="dv" style="justify-content:space-between;font-family:var(--mono);font-size:10px;color:#6A6157;margin-top:2px"><span style="flex:1"></span><span style="width:96px;display:flex;justify-content:space-between"><span>−12</span><span>0</span><span>+12</span></span><span style="width:30px"></span></div>`;
+})();
+
+/* ---- today: timeline ---- */
+(function(){const s=document.getElementById('timeline');const W=1100,L=72,Rr=10;const pw=W-L-Rr;const X=h=>L+h/24*pw;
+  // lanes
+  const sy=22,sh=34; const cy0=82,cy1=196;
+  txt(s,0,sy+sh/2+3,'STATE');txt(s,0,cy0+26,'CLARITY');
+  // hour grid
+  for(let h=0;h<=24;h+=3){el('line',{x1:X(h),x2:X(h),y1:sy-6,y2:cy1,stroke:'rgba(240,226,204,.05)'},s);txt(s,X(h),cy1+18,String(h).padStart(2,'0')+':00',{'text-anchor':h===0?'start':h===24?'end':'middle'});}
+  // clarity axis
+  const Y=v=>cy1-(v/100)*(cy1-cy0);
+  [0,50,100].forEach(v=>{el('line',{x1:L,x2:W-Rr,y1:Y(v),y2:Y(v),stroke:'rgba(240,226,204,'+(v?'.06':'.16')+')'},s);txt(s,L-8,Y(v)+3,v,{'text-anchor':'end'});});
+  // segments
+  day.forEach(([a,b,k,l])=>{const x=X(a)+1,w=Math.max(X(b)-X(a)-2,1.5);const r=el('rect',{x,y:sy,width:w,height:sh,rx:3,fill:C[k]},s);
+    // faint band in clarity lane
+    el('rect',{x,y:cy0,width:w,height:cy1-cy0,fill:C[k],'fill-opacity':.05},s);
+    r.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${fmtH(a)}–${fmtH(b)} · ${dur(b-a)}</div><div class="tv"><i class="dot" style="background:${C[k]}"></i>${NAME[k]} · ${l}</div>`));r.addEventListener('mouseleave',hideTip);
+    {const cw=6.4,lab=(l.length*cw+16<w)?l:(NAME[k].length*cw+16<w?NAME[k]:'');if(lab)txt(s,x+8,sy+sh/2+4,lab,{style:'fill:#16120E;font-size:10.5px;font-weight:500'});}
+  });
+  el('rect',{x:X(NOW)+1,y:sy,width:X(24)-X(NOW)-1,height:sh,rx:3,fill:'none',stroke:'rgba(240,226,204,.14)','stroke-dasharray':'3 3'},s);
+  // clarity line
+  let d='',pts=[];for(let h=6.8;h<=NOW+.001;h+=1/12){const v=clarity(h)+(R()-.5)*2.5;pts.push([h,v]);d+=(d?'L':'M')+X(h).toFixed(1)+' '+Y(v).toFixed(1);}
+  el('path',{d,fill:'none',stroke:'#EFE7DA','stroke-width':1.6,'stroke-linejoin':'round'},s);
+  el('path',{d:`M${X(0)} ${Y(0)} L${X(6.8)} ${Y(0)}`,stroke:'none'},s);
+  txt(s,X(3.4),Y(0)-8,'asleep · not scored',{'text-anchor':'middle'});
+  // nudge markers
+  [[7.08,'Phone down. Kettle\'s that way.','taken'],[11.57,'Close the laptop and walk?','taken'],[15.87,'Sam will ask about the budget.','opened'],[21.7,'Finish the chapter from Tuesday?','ignored']].forEach(([h,t,st])=>{
+    const g=el('g',{},s);el('path',{d:`M${X(h)} ${sy-12} l4 4 l-4 4 l-4 -4z`,fill:st==='ignored'?'#7E7468':C.accent},g);
+    const hit=el('rect',{x:X(h)-8,y:sy-16,width:16,height:16,fill:'transparent'},g);hit.addEventListener('mousemove',e=>showTip(e,`<div class="tt">Nudge · ${fmtH(h)} · ${st}</div>"${t}"`));hit.addEventListener('mouseleave',hideTip);});
+  // now
+  el('line',{x1:X(NOW),x2:X(NOW),y1:sy-14,y2:cy1,stroke:C.accent,'stroke-width':1.2},s);
+  const last=pts[pts.length-1];el('circle',{cx:X(last[0]),cy:Y(last[1]),r:4,fill:C.accent,stroke:'#181410','stroke-width':2},s);
+  txt(s,X(NOW)+6,cy0-4,'NOW 22:20',{style:'fill:#F2A649'});
+  // peak label
+  el('circle',{cx:X(10.66),cy:Y(86),r:3,fill:'#EFE7DA'},s);txt(s,X(10.66)+6,Y(86)-6,'86 · 10:40',{style:'fill:#B3A897'});
+  // crosshair
+  const ch=el('line',{x1:0,x2:0,y1:cy0,y2:cy1,stroke:'rgba(240,226,204,.3)',visibility:'hidden'},s);
+  const hit=el('rect',{x:L,y:cy0,width:pw,height:cy1-cy0,fill:'transparent'},s);
+  hit.addEventListener('mousemove',e=>{const r=s.getBoundingClientRect();const h=((e.clientX-r.left)/r.width*W-L)/pw*24;if(h<6.8||h>NOW){ch.setAttribute('visibility','hidden');hideTip();return;}
+    const p=pts.reduce((a,b)=>Math.abs(b[0]-h)<Math.abs(a[0]-h)?b:a);ch.setAttribute('x1',X(p[0]));ch.setAttribute('x2',X(p[0]));ch.setAttribute('visibility','visible');
+    const seg=day.find(([a,b])=>p[0]>=a&&p[0]<b)||day[day.length-1];showTip(e,`<div class="tt">${fmtH(p[0])}</div><div class="tv">Clarity ${Math.round(p[1])}</div><div class="tv"><i class="dot" style="background:${C[seg[2]]}"></i>${NAME[seg[2]]} · ${seg[3]}</div>`);});
+  hit.addEventListener('mouseleave',()=>{ch.setAttribute('visibility','hidden');hideTip();});
+})();
+
+/* ---- patterns: line ---- */
+(function(){const s=document.getElementById('pline');const W=1100,H=250,L=10,Rr=40,T=14,B=28;const n=30;
+  const R2=rnd(5);const v=[];for(let i=0;i<n;i++){const wd=(i+3)%7; // 0=Mon... day 0 = Wed 14 Oct
+    let b=66+i*0.28+(R2()-.5)*8;if(wd===3)b-=6;if(wd===5||wd===6)b+=4;v.push(Math.round(Math.max(48,Math.min(88,b))));}
+  v[n-1]=68; const avg=Math.round(v.reduce((a,b)=>a+b,0)/n);
+  const X=i=>L+i*(W-L-Rr)/(n-1),Y=x=>T+(H-T-B)*(1-(x-40)/60);
+  [40,60,80,100].forEach(g=>{el('line',{x1:L,x2:W-Rr,y1:Y(g),y2:Y(g),stroke:'rgba(240,226,204,'+(g===40?'.16':'.06')+')'},s);txt(s,W-Rr+8,Y(g)+3,g);});
+  el('line',{x1:L,x2:W-Rr,y1:Y(71),y2:Y(71),stroke:'rgba(240,226,204,.4)','stroke-dasharray':'2 4'},s);txt(s,W-Rr+8,Y(71)+3,'71',{style:'fill:#B3A897'});
+  const dates=[];for(let i=0;i<n;i++){const d=new Date(2026,9,14+i);dates.push(d);}
+  dates.forEach((d,i)=>{if(i%4===1||i===n-1)txt(s,X(i),H-8,d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()],{'text-anchor':i===n-1?'end':'middle'});});
+  let d='',a='';v.forEach((p,i)=>{d+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(p).toFixed(1);});
+  a=d+`L${X(n-1)} ${Y(40)} L${X(0)} ${Y(40)}Z`;
+  const gid='pg';const defs=el('defs',{},s);const lg=el('linearGradient',{id:gid,x1:0,y1:0,x2:0,y2:1},defs);el('stop',{offset:0,'stop-color':C.accent,'stop-opacity':.18},lg);el('stop',{offset:1,'stop-color':C.accent,'stop-opacity':0},lg);
+  el('path',{d:a,fill:`url(#${gid})`},s);
+  el('path',{d,fill:'none',stroke:C.accent,'stroke-width':2,'stroke-linejoin':'round'},s);
+  el('circle',{cx:X(n-1),cy:Y(v[n-1]),r:4.5,fill:C.accent,stroke:'#181410','stroke-width':2},s);
+  const ch=el('line',{y1:T,y2:H-B,stroke:'rgba(240,226,204,.3)',visibility:'hidden'},s);const dotc=el('circle',{r:4,fill:C.accent,stroke:'#181410','stroke-width':2,visibility:'hidden'},s);
+  const hit=el('rect',{x:L,y:T,width:W-L-Rr,height:H-T-B,fill:'transparent'},s);
+  hit.addEventListener('mousemove',e=>{const r=s.getBoundingClientRect();const xi=Math.round(((e.clientX-r.left)/r.width*W-L)/(W-L-Rr)*(n-1));const i=Math.max(0,Math.min(n-1,xi));
+    ch.setAttribute('x1',X(i));ch.setAttribute('x2',X(i));ch.setAttribute('visibility','visible');dotc.setAttribute('cx',X(i));dotc.setAttribute('cy',Y(v[i]));dotc.setAttribute('visibility','visible');
+    const dd=dates[i];showTip(e,`<div class="tt">${dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div><div class="tv"><i class="dot" style="background:${C.accent}"></i>Clarity ${v[i]} <span style="color:#7E7468">· ${v[i]-71>=0?'+':'−'}${Math.abs(v[i]-71)} vs avg</span></div>`);});
+  hit.addEventListener('mouseleave',()=>{ch.setAttribute('visibility','hidden');dotc.setAttribute('visibility','hidden');hideTip();});
+})();
+
+/* ---- patterns: heatmap ---- */
+(function(){const s=document.getElementById('heat');const W=640,H=230,L=36,T=6,B=34;const rows=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const hrs=[];for(let h=6;h<24;h++)hrs.push(h);
+  const cw=(W-L)/hrs.length,chh=(H-T-B)/7;const R3=rnd(9);
+  // sequential single-hue ramp (drift), light->dark on dark surface means low=faint
+  const ramp=['#2A211C','#4A2B24','#6E352C','#953F33','#C2523F','#E07B66'];
+  const val=(r,h)=>{let b=1+R3()*5;const j=()=>R3();if(h>=21&&h<23)b+=(r<4?18:r===4?10:8)+j()*12;if(h===23&&r<5)b+=j()*10;if(h===7&&r<5)b+=4+j()*10;if(h===12||h===13)b+=j()*9;if(h===15||h===16)b+=j()*10;if(r>=5&&h>=10&&h<14)b+=4+j()*10;if(r===3&&h===22)b+=6;return Math.round(Math.min(40,b));};
+  rows.forEach((d,r)=>{txt(s,L-8,T+r*chh+chh/2+3,d,{'text-anchor':'end'});hrs.forEach((h,j)=>{const m=val(r,h);const k=Math.min(5,Math.floor(m/7));
+    const c=el('rect',{x:L+j*cw+1,y:T+r*chh+1,width:cw-2,height:chh-2,rx:2,fill:ramp[k]},s);
+    c.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${d} · ${String(h).padStart(2,'0')}:00</div><div class="tv"><i class="dot" style="background:${C.drift}"></i>${m} min drift, avg</div>`));c.addEventListener('mouseleave',hideTip);});});
+  hrs.forEach((h,j)=>{if(h%3===0)txt(s,L+j*cw+cw/2,H-B+14,String(h).padStart(2,'0'),{'text-anchor':'middle'});});
+  // ramp legend
+  const lx=W-180;txt(s,lx-6,H-4,'0',{'text-anchor':'end'});ramp.forEach((c,i)=>el('rect',{x:lx+i*24,y:H-12,width:22,height:8,rx:1.5,fill:c},s));txt(s,lx+6*24+4,H-4,'35+ min');
+})();
+
+/* ---- patterns: stacked bars (waking hours) ---- */
+(function(){const s=document.getElementById('stack');const W=460,H=230,L=30,T=6,B=34;
+  const days=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'];
+  const data=[[5.6,3.9,2.0,3.5],[2.1,6.2,1.2,6.0],[1.2,5.0,2.4,6.4],[6.1,3.4,1.5,3.6],[5.8,3.8,1.6,3.8],[6.3,3.5,1.3,3.9],[6.6,4.8,2.2,1.7]];
+  const keys=['focus','social','drift','rest'];const max=18;const Y=v=>T+(H-T-B)*(1-v/max);
+  [0,6,12,18].forEach(g=>{el('line',{x1:L,x2:W,y1:Y(g),y2:Y(g),stroke:'rgba(240,226,204,'+(g?'.06':'.16')+')'},s);txt(s,L-8,Y(g)+3,g+'h',{'text-anchor':'end'});});
+  const bw=(W-L)/7;
+  data.forEach((row,i)=>{let acc=0;const x=L+i*bw+bw*.2,w=bw*.6;row.forEach((v,k)=>{const y0=Y(acc),y1=Y(acc+v);const r=el('rect',{x,y:y1+1,width:w,height:Math.max(y0-y1-2,1),rx:2,fill:C[keys[k]]},s);
+    r.addEventListener('mousemove',e=>showTip(e,`<div class="tt">${days[i]}</div><div class="tv"><i class="dot" style="background:${C[keys[k]]}"></i>${NAME[keys[k]]} · ${dur(v)}</div>`));r.addEventListener('mouseleave',hideTip);acc+=v;});
+    txt(s,x+w/2,H-B+14,days[i],{'text-anchor':'middle',style:i===6?'fill:#EFE7DA':''});});
+  // legend
+  let lx=L;keys.forEach(k=>{el('rect',{x:lx,y:H-10,width:8,height:8,rx:2,fill:C[k]},s);const t=txt(s,lx+12,H-3,NAME[k]);lx+=NAME[k].length*7+30;});
+})();
+
+/* ---- people ---- */
+(function(){const tb=document.querySelector('#ptable tbody');
+  const P=[['Maya Chen','Partner','#5B4A3C',14,'restores','19h 40m','Tonight, 19:12',0],['Priya Nair','Design lead','#3E4A44',11,'restores','6h 10m','Today, 11:48',1],['Jonah Weiss','Old friend','#4A3F52',9,'restores','2h 05m','6 days ago',1],['Leah Park','Manager','#3B4552',3,'neutral','4h 30m','Yesterday',0],['Dad','Family','#4E4434',2,'neutral','1h 15m','Sunday',0],['Dana Ortiz','Friend','#523E3A',1,'neutral','0h 40m','19 days ago',1],['Sam Okafor','Report','#3A4A4F',-3,'drains','5h 50m','Today, 15:48',2],['Ravi Mehta','Landlord','#45403A',-6,'drains','0h 25m','3 Nov',0],['Family chat','Group thread','#4A3A33',-11,'drains','9h 10m','Tonight, 23:02',0]];
+  const E={restores:['Restores',C.social],neutral:['Neutral','#7E7468'],drains:['Drains',C.drift]};
+  tb.innerHTML=P.map(([n,r,c,v,e,t,l,o])=>`<tr><td><div class="who"><i style="background:${c}">${n.split(' ').filter(x=>/^[A-Za-z]/.test(x)).map(x=>x[0].toUpperCase()).join('').slice(0,2)}</i><div>${n}<small>${r}</small></div></div></td>
+  <td><span class="en"><i class="dot" style="background:${E[e][1]}"></i>${E[e][0]}</span></td>
+  <td><div class="dv"><span class="tr"><b style="${v>=0?`left:50%;width:${v/16*50}%;background:${C.social}`:`right:50%;width:${-v/16*50}%;background:${C.drift}`}"></b></span><span class="mono">${v>0?'+':v<0?'−':''}${Math.abs(v)}</span></div></td>
+  <td class="mono" style="text-align:right;font-size:12px">${t}</td><td style="color:var(--ink-2)">${l}</td><td>${o?`<span class="st wait">${o} open</span>`:'<span style="color:var(--ink-4)">—</span>'}</td></tr>`).join('');
+})();
+
+const ms=document.querySelector('.msgs');ms.scrollTop=ms.scrollHeight;
+const h=(location.hash||'').slice(1);if(['chat','today','patterns','people'].includes(h))go(h);
+if(h==='card'){const d=document.querySelector('.dcard');ms.scrollTop=d.offsetTop-ms.offsetTop-150;}
+})();
+</script>
+</body>
+</html>

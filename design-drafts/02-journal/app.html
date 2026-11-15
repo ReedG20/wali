@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind — Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2EDE3;
+    --paper-deep:#E8E1D3;
+    --ink:#161412;
+    --ink-2:rgba(22,20,18,.70);
+    --ink-3:rgba(22,20,18,.48);
+    --rule:rgba(22,20,18,.20);
+    --accent:#CF3A1F;
+    --display:"Bodoni Moda","Didot","Bodoni 72",serif;
+    --book:"Newsreader","Iowan Old Style",Georgia,serif;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --side:300px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--book);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  a{color:inherit}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+  .muted{color:var(--ink-3)}
+  .accent{color:var(--accent)}
+  sup.fn{font-family:var(--mono);font-size:10px;color:var(--accent);vertical-align:super;line-height:0;margin-left:2px}
+
+  .app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);height:100vh}
+
+  /* ---------- Sidebar ---------- */
+  aside.side{border-right:1px solid var(--ink);display:flex;flex-direction:column;min-height:0;background:var(--paper)}
+  .brand{padding:18px 22px 12px;display:flex;align-items:baseline;justify-content:space-between}
+  .brand .wm{font-family:var(--display);font-size:38px;line-height:1;font-weight:500;letter-spacing:-.03em;text-decoration:none}
+  .brand .wm i{font-weight:400}
+  .dbl{border-top:3px solid var(--ink);height:5px;border-bottom:1px solid var(--ink);margin:0 22px}
+  .views{display:flex;gap:18px;padding:14px 22px 0;border-bottom:1px solid var(--rule);margin:0 0 0}
+  .views button{white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:0 0 12px;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .views button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .search{margin:16px 22px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--ink);padding-bottom:6px}
+  .search input{flex:1;min-width:0;background:transparent;border:0;outline:0;font-family:var(--book);font-style:italic;font-size:16px;color:var(--ink)}
+  .search input::placeholder{color:var(--ink-3)}
+  .search kbd{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+  .toc{flex:1;overflow:auto;padding:6px 0 12px}
+  .toc h6{padding:16px 22px 8px;color:var(--ink-3);font-weight:400}
+  .toc a{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:11px 22px 11px 19px;text-decoration:none;border-left:3px solid transparent;position:relative}
+  .toc a:hover{background:var(--paper-deep)}
+  .toc a.on{border-left-color:var(--accent);background:var(--paper-deep)}
+  .toc .d{text-align:center;line-height:1}
+  .toc .d .dw{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink-3);display:block}
+  .toc .d .dn{font-family:var(--display);font-size:26px;font-weight:500;display:block;margin-top:3px}
+  .toc a > span:last-child{display:block;line-height:1.3;min-width:0}
+  .toc .t{display:block;font-size:16px;line-height:1.3}
+  .toc .x{display:block;font-size:13.5px;font-style:italic;color:var(--ink-3);line-height:1.35;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .toc .no{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:4px}
+  .device{border-top:1px solid var(--ink);padding:14px 22px 16px;display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center}
+  .device .nm{font-size:15px;line-height:1.2}
+  .device .st{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .device .st .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px;animation:breathe 3.2s ease-in-out infinite}
+  .device.paused .st .dot{background:var(--ink-3);animation:none}
+  .device button{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--ink);padding:7px 9px}
+  .device button:hover{background:var(--ink);color:var(--paper)}
+  @keyframes breathe{0%,100%{opacity:1}50%{opacity:.25}}
+
+  /* ---------- Main ---------- */
+  main{display:flex;flex-direction:column;min-height:0;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 32px;height:52px;border-bottom:1px solid var(--ink);flex:none}
+  .crumbs{display:flex;gap:10px;color:var(--ink-3);white-space:nowrap;overflow:hidden}
+  .crumbs b{font-weight:400;color:var(--ink)}
+  .topbar .right{display:flex;gap:22px;align-items:center}
+  .tl{white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px}
+  .menu-btn{display:none}
+  .scroll{flex:1;overflow:auto;min-height:0;scroll-behavior:smooth}
+  .view{display:none}
+  .view.on{display:block}
+
+  /* page grid: speaker | text | margin */
+  .page{max-width:1100px;margin:0 auto;padding:32px 40px 40px}
+  .row{display:grid;grid-template-columns:96px minmax(0,1fr) 250px;column-gap:36px}
+  .row > .who{grid-column:1}
+  .row > .txt{grid-column:2}
+  .row > .mg{grid-column:3}
+
+  .phead .when{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:16px}
+  .phead h1{font-family:var(--display);font-weight:500;font-size:44px;line-height:1.02;letter-spacing:-.022em;font-variation-settings:"opsz" 96}
+  .phead h1 i{font-weight:400}
+  .phead .stand{font-style:italic;font-size:20px;color:var(--ink-2);margin-top:14px;max-width:44ch;line-height:1.45}
+  .folio{font-family:var(--display);font-size:46px;line-height:.9;font-weight:500;text-align:left}
+  .folio small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;font-weight:400}
+  .double{border-top:3px solid var(--ink);height:5px;border-bottom:1px solid var(--ink);margin:22px 0 22px}
+  .figs{border-top:1px solid var(--ink);font-size:14.5px}
+  .figs caption{text-align:left}
+  .figs div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule)}
+  .figs div span:last-child{font-family:var(--mono);font-size:12px}
+  .figs .h{border-bottom:0;padding:8px 0 4px;color:var(--ink-3)}
+
+  .entry{padding:12px 0 14px}
+  .who .sp{font-family:var(--mono);font-size:11px;letter-spacing:.16em;display:block;padding-top:6px}
+  .who .sp.mind{color:var(--accent)}
+  .who .tm{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);display:block;margin-top:3px}
+  .txt p{font-size:19px;line-height:1.58}
+  .txt p + p{margin-top:10px}
+  .entry.you .txt p{font-style:italic;color:var(--ink)}
+  .entry.you .txt{border-left:1px solid var(--rule);padding-left:18px;margin-left:-19px}
+  .mg{font-size:14.5px;line-height:1.45;color:var(--ink-2);padding-top:6px}
+  .mg .mn{display:block;border-top:1px solid var(--accent);padding-top:8px}
+  .mg .mn b{font-family:var(--mono);font-weight:500;font-size:10.5px;color:var(--accent);margin-right:6px}
+  .mg .mn em{color:var(--ink)}
+  .mg .mn .meta{display:block;margin-top:6px;font-size:9.5px;color:var(--ink-3)}
+
+  .orn{text-align:center;padding:26px 0 18px}
+  .orn > span:first-child{font-family:var(--display);font-size:22px;letter-spacing:.4em;color:var(--ink-3)}
+  .orn .meta{display:block;margin-top:4px;color:var(--ink-3)}
+
+  /* typeset notes (nudges + approvals) */
+  .note{border:1px solid var(--ink);background:var(--paper);margin:8px 0 6px;position:relative}
+  .note::before{content:"";position:absolute;inset:3px;border:1px solid var(--rule);pointer-events:none}
+  .note-h{display:flex;justify-content:space-between;gap:12px;padding:11px 18px;border-bottom:1px solid var(--ink)}
+  .note-h .kind{color:var(--accent)}
+  .note-b{padding:18px 18px 6px}
+  .note-b blockquote{font-family:var(--display);font-style:italic;font-size:27px;line-height:1.18;letter-spacing:-.01em;font-variation-settings:"opsz" 48}
+  .note-b blockquote{text-indent:-.38em}
+  .note-b blockquote::before{content:"“";color:var(--accent)}
+  .note-b blockquote::after{content:"”";color:var(--accent)}
+  .note-b .ctx{font-size:15.5px;color:var(--ink-2);margin-top:10px;line-height:1.45}
+  .note-b p{font-size:17.5px;line-height:1.5}
+  .draft{margin:12px 0 4px;padding:12px 14px;border-left:2px solid var(--accent);background:var(--paper-deep);font-style:italic;font-size:17px;line-height:1.5}
+  .kv{display:grid;grid-template-columns:110px 1fr;font-size:15px;margin-top:10px}
+  .kv > span{padding:6px 0;border-bottom:1px solid var(--rule)}
+  .kv > span:nth-child(odd){font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding-top:9px}
+  .note-f{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 18px 18px}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:var(--paper);border:1px solid var(--ink);padding:11px 16px;transition:background .2s,border-color .2s,color .2s}
+  .btn:hover{background:var(--accent);border-color:var(--accent)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn.text{background:none;border-color:transparent;color:var(--ink-3);padding-left:6px;padding-right:6px}
+  .btn.text:hover{color:var(--ink);background:none;border-color:transparent}
+  .note-f .risk{margin-left:auto;color:var(--ink-3);font-size:10px}
+  .note .stamp{display:none;align-items:center;gap:10px;padding:14px 18px 18px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+  .note .stamp .s{border:1px solid var(--accent);color:var(--accent);padding:6px 10px;transform:rotate(-2deg)}
+  .note.done .note-f{display:none}
+  .note.done .stamp{display:flex}
+  .note.small .note-b{padding:12px 18px 4px}
+  .note.small .note-b p{font-size:16px}
+
+  .outcome{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding:4px 0 0}
+  .outcome b{color:var(--accent);font-weight:400}
+
+  /* composer */
+  .composer{flex:none;border-top:1px solid var(--ink);background:var(--paper)}
+  .composer .inner{max-width:1100px;margin:0 auto;padding:12px 40px 16px}
+  .prompts{display:flex;gap:18px;flex-wrap:wrap;padding-bottom:10px;align-items:baseline}
+  .prompts button{font-family:var(--book);font-style:italic;font-size:15px;color:var(--ink-2);border-bottom:1px dotted var(--ink-3);padding:0}
+  .prompts button:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  .compose-row{display:flex;align-items:flex-end;gap:16px}
+  .compose-row .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.16em;padding-bottom:12px;width:96px;flex:none}
+  .compose-row textarea{flex:1;min-width:0;resize:none;background:transparent;border:0;border-bottom:1px solid var(--ink);outline:0;font-family:var(--book);font-size:19px;line-height:1.45;padding:6px 0 8px;color:var(--ink);height:42px;max-height:140px}
+  .compose-row textarea::placeholder{font-style:italic;color:var(--ink-3)}
+  .compose-row .icon{width:40px;height:40px;border:1px solid var(--ink);display:grid;place-items:center;flex:none}
+  .compose-row .icon:hover{background:var(--ink);color:var(--paper)}
+
+  /* ---------- Conversation notes ---------- */
+  .cn .row{grid-template-columns:minmax(0,1fr) 330px;column-gap:48px}
+  .cn .row > *{grid-column:auto}
+  .cn h1{font-family:var(--display);font-weight:500;font-size:54px;line-height:1;letter-spacing:-.022em}
+  .cn h1 i{font-weight:400}
+  .cn .stand{font-style:italic;font-size:21px;color:var(--ink-2);margin-top:14px;line-height:1.45;max-width:46ch}
+  .facts{display:grid;grid-template-columns:120px 1fr;border-top:1px solid var(--ink);margin-top:26px;font-size:16px}
+  .facts > span{padding:9px 0;border-bottom:1px solid var(--rule)}
+  .facts > span:nth-child(odd){font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);padding-top:12px}
+  .facts .bar{display:inline-block;height:6px;background:var(--ink);vertical-align:1px;margin:0 8px 0 4px}
+  .facts .bar.p{background:none;border:1px solid var(--ink)}
+  .sec{margin-top:40px}
+  .sec > .meta{display:flex;justify-content:space-between;border-bottom:1px solid var(--ink);padding-bottom:8px;margin-bottom:16px}
+  .gist p{font-size:19px;line-height:1.6}
+  .gist p + p{text-indent:1.5em}
+  .gist .dc::first-letter{font-family:var(--display);float:left;font-size:78px;line-height:.8;padding:6px 10px 0 0;font-weight:500;color:var(--accent)}
+  .moments li{list-style:none;display:grid;grid-template-columns:54px 70px minmax(0,1fr) 84px;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  .moments .ts{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .moments .sp{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em}
+  .moments q{font-style:italic;font-size:17.5px;line-height:1.45;quotes:"“" "”"}
+  .moments .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;text-align:right;color:var(--ink-3)}
+  .moments .tag.p{color:var(--accent)}
+  .script .ln{display:grid;grid-template-columns:54px 70px minmax(0,1fr);gap:14px;padding:7px 0}
+  .script .ts{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:5px}
+  .script .sp{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;padding-top:5px}
+  .script .sp.you{color:var(--ink)}
+  .script p{font-size:17.5px;line-height:1.55}
+  .script mark{background:none;color:inherit;box-shadow:inset 0 -2px 0 var(--accent)}
+  .script .skip{text-align:center;color:var(--ink-3);font-family:var(--display);letter-spacing:.4em;padding:6px 0}
+  .fu-h{display:flex;justify-content:space-between;border-bottom:1px solid var(--ink);padding-bottom:8px;margin-bottom:6px}
+  .fu .note{margin-top:14px}
+  .fu .note-b p{font-size:16px}
+  .fu .draft{font-size:15.5px}
+  .people{margin-top:30px;border-top:1px solid var(--ink);padding-top:10px;font-size:15px}
+  .people div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
+  .people div span:last-child{color:var(--ink-3);font-style:italic;text-align:right}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:1180px){
+    .row{grid-template-columns:80px minmax(0,1fr) 210px;column-gap:26px}
+    .cn .row{grid-template-columns:minmax(0,1fr) 290px;column-gap:32px}
+  }
+  @media (max-width:900px){
+    body{overflow:auto}
+    .app{grid-template-columns:1fr;height:auto;min-height:100vh}
+    aside.side{position:fixed;inset:0 auto 0 0;width:min(320px,88vw);z-index:50;transform:translateX(-102%);transition:transform .3s ease;box-shadow:0 0 0 100vmax rgba(22,20,18,0)}
+    aside.side.open{transform:none;box-shadow:0 0 0 100vmax rgba(22,20,18,.35)}
+    main{min-height:100vh}
+    .menu-btn{display:inline-block}
+    .topbar{padding:0 16px;position:sticky;top:0;background:var(--paper);z-index:10}
+    .topbar .hide-sm{display:none}
+    .crumbs b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .crumbs{min-width:0}
+    .phead .when{flex-direction:column;gap:4px}
+    .scroll{overflow:visible}
+    .page{padding:28px 16px 24px}
+    .row,.cn .row{grid-template-columns:1fr}
+    .row > .who,.row > .txt,.row > .mg{grid-column:1}
+    .who{display:flex;gap:10px;align-items:baseline}
+    .who .sp{padding-top:0}
+    .who .tm{margin-top:0}
+    .entry.you .txt{margin-left:0}
+    .mg{margin-top:10px;padding-left:14px;border-left:1px solid var(--accent)}
+    .mg .mn{border-top:0;padding-top:0}
+    .mg:empty{display:none}
+    .phead h1{font-size:36px}
+    .phead .mg{border-left:0;padding-left:0}
+    .folio{display:none}
+    .note-b blockquote{font-size:23px}
+    .note-f .risk{margin-left:0;width:100%}
+    .composer{position:sticky;bottom:0}
+    .composer .inner{padding:10px 16px 12px}
+    .compose-row .lbl{display:none}
+    .prompts{flex-wrap:nowrap;overflow-x:auto;gap:14px}
+    .prompts button{white-space:nowrap}
+    .cn h1{font-size:38px}
+    .moments li{grid-template-columns:48px 1fr;gap:6px 12px}
+    .moments q{grid-column:1/-1}
+    .moments .tag{grid-column:1/-1;text-align:left}
+    .script .ln{grid-template-columns:48px 1fr;gap:4px 12px}
+    .script p{grid-column:1/-1}
+    .facts{grid-template-columns:96px 1fr}
+    .fu{margin-top:40px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+  .fadein{animation:fadein .5s ease both}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="side" id="side" aria-label="Notebook contents">
+    <div class="brand">
+      <a class="wm" href="landing.html" aria-label="Mind home">M<i>i</i>nd</a>
+      <span class="meta muted">Vol. I</span>
+    </div>
+    <div class="dbl"></div>
+    <div class="views" role="tablist" aria-label="Views">
+      <button role="tab" aria-selected="true" data-view="notebook">Notebook</button>
+      <button role="tab" aria-selected="false" data-view="notes">Conversation notes</button>
+    </div>
+    <label class="search"><input type="search" placeholder="Search your pages…" aria-label="Search"><kbd>⌘K</kbd></label>
+
+    <nav class="toc" id="toc-notebook" aria-label="Days">
+      <h6 class="meta">This week</h6>
+      <a href="#" class="on"><span class="d"><span class="dw">SAT</span><span class="dn">14</span></span><span><span class="t">The Tuesday chapter</span><span class="x">Today · page 318</span></span></a>
+      <a href="#"><span class="d"><span class="dw">FRI</span><span class="dn">13</span></span><span><span class="t">Coffee with Priya, then a long walk</span><span class="x">You owe her two things</span></span></a>
+      <a href="#"><span class="d"><span class="dw">THU</span><span class="dn">12</span></span><span><span class="t">Third morning of writing first</span><span class="x">The streak you asked for</span></span></a>
+      <a href="#"><span class="d"><span class="dw">WED</span><span class="dn">11</span></span><span><span class="t">Dad called. The boat, again.</span><span class="x">Fourteen laughs in forty minutes</span></span></a>
+      <a href="#"><span class="d"><span class="dw">TUE</span><span class="dn">10</span></span><span><span class="t">Standup ran over (again)</span><span class="x">Twenty-two minutes past</span></span></a>
+      <a href="#"><span class="d"><span class="dw">MON</span><span class="dn">9</span></span><span><span class="t">Fifty-two minutes, then page 112</span><span class="x">A spiral, turned around</span></span></a>
+      <h6 class="meta">Earlier in November</h6>
+      <a href="#"><span class="d"><span class="dw">SUN</span><span class="dn">8</span></span><span><span class="t">A quiet Sunday, mostly reading</span><span class="x">No notes sent. Good.</span></span></a>
+      <a href="#"><span class="d"><span class="dw">SAT</span><span class="dn">7</span></span><span><span class="t">Letterpress on Ferris Street</span><span class="x">A sidequest, accepted</span></span></a>
+      <a href="#"><span class="d"><span class="dw">FRI</span><span class="dn">6</span></span><span><span class="t">The board prep, and after</span><span class="x">Drained. Early night.</span></span></a>
+    </nav>
+
+    <nav class="toc" id="toc-notes" aria-label="Conversations" hidden>
+      <h6 class="meta">This week</h6>
+      <a href="#" class="on"><span class="no">47</span><span><span class="t">Coffee with Priya Raman</span><span class="x">Fri 13 · 39 min · 3 follow-ups</span></span></a>
+      <a href="#"><span class="no">46</span><span><span class="t">Wednesday call with Dad</span><span class="x">Wed 11 · 41 min · 1 follow-up</span></span></a>
+      <a href="#"><span class="no">45</span><span><span class="t">Tuesday standup</span><span class="x">Tue 10 · 52 min · 4 owners</span></span></a>
+      <a href="#"><span class="no">44</span><span><span class="t">Maya, a walk in Prospect Park</span><span class="x">Mon 9 · 1 h 05 · 2 follow-ups</span></span></a>
+      <h6 class="meta">Earlier</h6>
+      <a href="#"><span class="no">43</span><span><span class="t">Landlord, about the radiator</span><span class="x">Sat 7 · 6 min · 1 follow-up</span></span></a>
+      <a href="#"><span class="no">42</span><span><span class="t">Board prep with Daniel and Ines</span><span class="x">Fri 6 · 1 h 30 · 7 owners</span></span></a>
+    </nav>
+
+    <div class="device" id="device">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><defs><radialGradient id="pg" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#4a4540"/><stop offset="1" stop-color="#0d0c0b"/></radialGradient></defs><circle cx="18" cy="20" r="13" fill="url(#pg)"/><rect x="15.5" y="2" width="5" height="7" rx="2.5" fill="none" stroke="#161412" stroke-width="1.2"/><circle cx="23" cy="20" r="1.6" fill="#CF3A1F"/></svg>
+      <div><div class="nm">Your pendant</div><div class="st" id="devst"><span class="dot"></span>Listening · 62%</div></div>
+      <button type="button" id="pause">Pause</button>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main>
+    <div class="topbar">
+      <div style="display:flex;gap:14px;align-items:center;min-width:0">
+        <button class="menu-btn tl" id="menu" type="button" aria-controls="side">Contents</button>
+        <div class="crumbs meta" id="crumbs"><span class="hide-sm">Notebook</span><span class="hide-sm">/</span><span class="hide-sm">November 2026</span><span class="hide-sm">/</span><b>Page 318</b></div>
+      </div>
+      <div class="right">
+        <span class="meta muted hide-sm">Saved 4:12 PM</span>
+        <a class="tl" href="#" id="toNotes">Yesterday’s coffee →</a>
+      </div>
+    </div>
+
+    <div class="scroll" id="scroll">
+
+      <!-- ============ VIEW 1: NOTEBOOK ============ -->
+      <section class="view on" id="view-notebook" aria-label="Today's page">
+        <div class="page">
+          <header class="phead row">
+            <div class="who"><div class="folio"><small>Page</small>318</div></div>
+            <div class="txt">
+              <div class="when meta"><span>Saturday · 14 November 2026</span><span class="muted">Brooklyn · 51°F, clearing</span></div>
+              <h1>A slow morning, a long call, and <i>the Tuesday chapter.</i></h1>
+              <p class="stand">So far today: three conversations, two hours of focus, and one spiral turned around before it took the afternoon.</p>
+            </div>
+            <div class="mg">
+              <div class="figs">
+                <div class="h meta"><span>Today in figures</span><span></span></div>
+                <div><span>Slept</span><span>6 h 40</span></div>
+                <div><span>Deep focus</span><span>2 h 10</span></div>
+                <div><span>Phone, social</span><span>1 h 41</span></div>
+                <div><span>Conversations</span><span>3</span></div>
+                <div><span>Notes sent</span><span>4 of 9</span></div>
+              </div>
+            </div>
+          </header>
+          <div class="row"><div></div><div class="double" style="grid-column:2/-1"></div></div>
+
+          <div id="thread">
+            <!-- 1 -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">08:52</span></div>
+              <div class="txt">
+                <p>Morning. You slept six hours forty and the day is light until two. One loose thread: Priya asked yesterday whether Thursday still works. It doesn’t, because the dentist moved to 3:30.<sup class="fn">1</sup> Want me to handle it?</p>
+              </div>
+              <div class="mg"><span class="mn"><b>1</b>Weeks when you move things <em>early</em> go better. That held four of the last five times.<span class="meta">Pattern · since September</span></span></div>
+            </div>
+            <!-- 2 -->
+            <div class="entry row you">
+              <div class="who"><span class="sp">YOU</span><span class="tm">08:55</span></div>
+              <div class="txt"><p>Yes, but keep it warm. She’s been stretched thin.</p></div>
+              <div class="mg"></div>
+            </div>
+            <!-- 3 approval -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">08:55</span></div>
+              <div class="txt">
+                <div class="note" data-approve>
+                  <div class="note-h meta"><span class="kind">For your approval</span><span>Calendar + Messages</span></div>
+                  <div class="note-b">
+                    <p>Move <b>Thursday’s 1:1 with Priya</b> to <b>Friday, 10:00</b> at Devoción and send her this:</p>
+                    <div class="draft">“Hey, let’s give Thursday back to you. Coffee Friday at 10 instead? No prep, just catching up.”</div>
+                  </div>
+                  <div class="note-f">
+                    <button class="btn" data-act="approve" type="button">Approve &amp; send</button>
+                    <button class="btn ghost" type="button">Edit draft</button>
+                    <button class="btn text" type="button">Not now</button>
+                    <span class="meta risk">Medium risk · sends as you</span>
+                  </div>
+                  <div class="stamp"><span class="s">Approved 08:57</span><span class="muted">Sent 08:58 · Friday held</span></div>
+                </div>
+              </div>
+              <div class="mg"><span class="mn"><b>2</b>Priya replies fastest before 10 a.m. Her mornings are <em>lighter</em> than her afternoons.<span class="meta">From 9 conversations</span></span></div>
+            </div>
+            <!-- 4 -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">09:06</span></div>
+              <div class="txt"><p>She wrote back: “Friday’s perfect, thank you.” I also kept the dentist at 3:30 and added the walk there, so you won’t have to rush.</p></div>
+              <div class="mg"></div>
+            </div>
+
+            <div class="orn"><span>⁂</span><span class="meta">Afternoon</span></div>
+
+            <!-- 5 nudge -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">14:20</span></div>
+              <div class="txt">
+                <div class="note" data-approve>
+                  <div class="note-h meta"><span class="kind">A note</span><span>Sent as one tap</span></div>
+                  <div class="note-b">
+                    <blockquote>You’ve been on TikTok for 52 minutes. Want to finish the chapter you started Tuesday?</blockquote>
+                    <p class="ctx"><i>The Overstory</i> is on the nightstand. You stopped at page 112, two pages into chapter nine.</p>
+                  </div>
+                  <div class="note-f">
+                    <button class="btn" data-act="approve" type="button">Open to p. 112</button>
+                    <button class="btn ghost" type="button">Ten more minutes</button>
+                    <button class="btn text" type="button">Not today</button>
+                  </div>
+                  <div class="stamp"><span class="s">Chose the book</span><span class="muted">Read 38 min · phone face-down</span></div>
+                </div>
+              </div>
+              <div class="mg"><span class="mn"><b>3</b>Third spiral this week. Each one started within <em>twenty minutes</em> of a work call.<span class="meta">Pattern · this week</span></span></div>
+            </div>
+            <!-- 6 -->
+            <div class="entry row you">
+              <div class="who"><span class="sp">YOU</span><span class="tm">15:31</span></div>
+              <div class="txt"><p>That call with Dad was really nice. Why do I always feel so good after talking to him?</p></div>
+              <div class="mg"></div>
+            </div>
+            <!-- 7 -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">15:31</span></div>
+              <div class="txt">
+                <p>You laugh more with him than with almost anyone. It was fourteen times in forty minutes today. You also brought up the boat again, and that’s the third time since September.<sup class="fn">4</sup></p>
+                <p>If you want, I can look at December weekends when you’re both free and the marina is still open.</p>
+              </div>
+              <div class="mg"><span class="mn"><b>4</b><em>Restores you:</em> Dad, Maya, Jonah. <em>Drains you:</em> the Tuesday standup, which averages 22 minutes over.<span class="meta">Relationship energy · 30 days</span></span></div>
+            </div>
+            <!-- 8 auto action -->
+            <div class="entry row">
+              <div class="who"><span class="sp mind">MIND</span><span class="tm">15:42</span></div>
+              <div class="txt">
+                <div class="note small">
+                  <div class="note-h meta"><span class="kind">Done on my own</span><span>Low risk · reversible</span></div>
+                  <div class="note-b"><p>I declined <b>“Optional: Q4 brainstorm”</b> for Tuesday at 4. You told me optional meetings on Tuesdays are a no.</p></div>
+                  <div class="note-f"><button class="btn ghost" type="button">Undo</button><span class="meta risk">Undo open for 24 h</span></div>
+                </div>
+              </div>
+              <div class="mg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VIEW 2: CONVERSATION NOTES ============ -->
+      <section class="view cn" id="view-notes" aria-label="Conversation notes">
+        <div class="page">
+          <div class="row">
+            <div>
+              <div class="meta"><span class="accent">Conversation notes</span> &nbsp;·&nbsp; <span class="muted">No. 47</span></div>
+              <h1 style="margin-top:16px">Coffee with <i>Priya Raman</i></h1>
+              <p class="stand">Thirty-nine minutes at Devoción. She’s stretched thin, she wants to lead the Lisbon offsite anyway, and you left owing her two things.</p>
+              <div class="facts">
+                <span>When</span><span>Friday 13 November, 10:02 to 10:41 a.m.</span>
+                <span>Where</span><span>Devoción, Grand Street, Williamsburg</span>
+                <span>Speakers</span><span>You <span class="bar" style="width:54px"></span>54% &nbsp; Priya <span class="bar p" style="width:46px"></span>46%</span>
+                <span>Consent</span><span>Priya agreed at 10:02: <i>“Totally fine, record away.”</i></span>
+                <span>After</span><span>You were a little lighter than usual, about +0.6 on your evening.</span>
+              </div>
+
+              <div class="sec gist">
+                <div class="meta"><span>I. &nbsp;The gist</span><span class="muted">Written by Mind</span></div>
+                <p class="dc">Priya opened with the week: two launches, a sick report, and her mother’s surgery on the 20th. She was candid that she’s running on fumes, but brightened when Lisbon came up. She wants to own the offsite agenda and asked whether you’d back her if Daniel pushes back.</p>
+                <p>You said yes, offered to introduce her to Ines for the venue, and promised to send last year’s deck by Monday. You both agreed the Thursday 1:1 should become a monthly coffee instead.</p>
+              </div>
+
+              <div class="sec">
+                <div class="meta"><span>II. &nbsp;Key moments</span><span class="muted">5 of 23</span></div>
+                <ol class="moments">
+                  <li><span class="ts">03:10</span><span class="sp">PRIYA</span><q>Honestly I’m running on fumes. Mom’s surgery is on the 20th.</q><span class="tag">Worry</span></li>
+                  <li><span class="ts">11:42</span><span class="sp">PRIYA</span><q>I want Lisbon. I want to run the whole agenda.</q><span class="tag">Ambition</span></li>
+                  <li><span class="ts">14:05</span><span class="sp">YOU</span><q>I’ll send you last year’s deck by Monday.</q><span class="tag p">Promise</span></li>
+                  <li><span class="ts">19:30</span><span class="sp">YOU</span><q>You should meet Ines. She found the venue in Porto.</q><span class="tag p">Promise</span></li>
+                  <li><span class="ts">36:48</span><span class="sp">PRIYA</span><q>Can this just be a coffee every month? This was better.</q><span class="tag">Decision</span></li>
+                </ol>
+              </div>
+
+              <div class="sec script">
+                <div class="meta"><span>III. &nbsp;From the transcript</span><span class="muted">13:40 – 14:20</span></div>
+                <div class="ln"><span class="ts">13:40</span><span class="sp">PRIYA</span><p>If Daniel says it’s too much on my plate, are you going to back me?</p></div>
+                <div class="ln"><span class="ts">13:48</span><span class="sp you">YOU</span><p>Yes. I think you’re the right person, and I’ll say so. What would help you make the case?</p></div>
+                <div class="ln"><span class="ts">13:57</span><span class="sp">PRIYA</span><p>Having last year’s deck. I don’t want to start from a blank page.</p></div>
+                <div class="ln"><span class="ts">14:05</span><span class="sp you">YOU</span><p>Done. <mark>I’ll send you last year’s deck by Monday.</mark></p></div>
+                <div class="skip">· · ·</div>
+              </div>
+            </div>
+
+            <!-- follow-ups -->
+            <div class="fu">
+              <div class="fu-h meta"><span>Follow-ups Mind drafted</span><span class="accent">3</span></div>
+
+              <div class="note" data-approve>
+                <div class="note-h meta"><span class="kind">For your approval</span><span>Email</span></div>
+                <div class="note-b">
+                  <p>To <b>Priya Raman</b>, with <i>Lisbon offsite 2026.pdf</i> attached:</p>
+                  <div class="draft">“Here’s last year’s deck, as promised. Slides 4 to 9 are the bits worth stealing. Ines is cc’d, since she found the Porto venue. Rooting for you.”</div>
+                </div>
+                <div class="note-f">
+                  <button class="btn" data-act="approve" type="button">Approve &amp; send</button>
+                  <button class="btn ghost" type="button">Edit</button>
+                  <span class="meta risk">Medium · introduces Ines</span>
+                </div>
+                <div class="stamp"><span class="s">Approved</span><span class="muted">Sent just now</span></div>
+              </div>
+
+              <div class="note" data-approve>
+                <div class="note-h meta"><span class="kind">For your approval</span><span>Calendar</span></div>
+                <div class="note-b">
+                  <p>Replace the weekly 1:1 with <b>Coffee with Priya</b> on the first Friday of each month at 10:00, starting 4 December.</p>
+                </div>
+                <div class="note-f">
+                  <button class="btn" data-act="approve" type="button">Approve</button>
+                  <button class="btn text" type="button">Not now</button>
+                  <span class="meta risk">Low · invites Priya</span>
+                </div>
+                <div class="stamp"><span class="s">Approved</span><span class="muted">Series created</span></div>
+              </div>
+
+              <div class="note small">
+                <div class="note-h meta"><span class="kind">Done on my own</span><span>Reminder</span></div>
+                <div class="note-b"><p>On Thursday 20 November at 6 p.m., I’ll remind you to ask how her mother’s surgery went.</p></div>
+                <div class="note-f"><button class="btn ghost" type="button">Undo</button><span class="meta risk">Private · only you see it</span></div>
+              </div>
+
+              <div class="people">
+                <div class="meta" style="color:var(--ink-3)"><span>In this conversation</span><span></span></div>
+                <div><span>Priya Raman</span><span>9th talk since July</span></div>
+                <div><span>Daniel Osei</span><span>mentioned · her manager</span></div>
+                <div><span>Ines Duarte</span><span>mentioned · intro promised</span></div>
+                <div><span>Lisbon offsite</span><span>February 2027</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- composer -->
+    <div class="composer" id="composer">
+      <div class="inner">
+        <div class="prompts" aria-label="Suggestions">
+          <span class="meta muted">Ask</span>
+          <button type="button">What did I promise this week?</button>
+          <button type="button">Who haven’t I seen in a while?</button>
+          <button type="button">Plan a sidequest for Sunday</button>
+        </div>
+        <form class="compose-row" id="compose">
+          <span class="lbl">YOU</span>
+          <textarea id="msg" rows="1" placeholder="Write to Mind, or ask about your day…" aria-label="Message"></textarea>
+          <button class="icon" type="button" aria-label="Dictate"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="5.5" y="1.5" width="5" height="8.5" rx="2.5"/><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5v2"/></svg></button>
+          <button class="btn" type="submit">Send ↵</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var views={notebook:document.getElementById('view-notebook'),notes:document.getElementById('view-notes')};
+  var tocs={notebook:document.getElementById('toc-notebook'),notes:document.getElementById('toc-notes')};
+  var tabs=[].slice.call(document.querySelectorAll('.views button'));
+  var crumbs=document.getElementById('crumbs');
+  var composer=document.getElementById('composer');
+  var toNotes=document.getElementById('toNotes');
+  var side=document.getElementById('side');
+  function show(v){
+    Object.keys(views).forEach(function(k){views[k].classList.toggle('on',k===v);tocs[k].hidden=(k!==v)});
+    tabs.forEach(function(t){t.setAttribute('aria-selected',t.dataset.view===v?'true':'false')});
+    crumbs.innerHTML = v==='notebook'
+      ? '<span class="hide-sm">Notebook</span><span class="hide-sm">/</span><span class="hide-sm">November 2026</span><span class="hide-sm">/</span><b>Page 318</b>'
+      : '<span class="hide-sm">Conversation notes</span><span class="hide-sm">/</span><b>No. 47 · Priya Raman</b>';
+    toNotes.textContent = v==='notebook' ? 'Yesterday’s coffee →' : '← Back to today';
+    composer.style.display = v==='notebook' ? '' : 'none';
+    document.getElementById('scroll').scrollTop=0; window.scrollTo(0,0);
+    side.classList.remove('open');
+    try{localStorage.setItem('mind-view',v)}catch(e){}
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.view)})});
+  toNotes.addEventListener('click',function(e){e.preventDefault();show(views.notebook.classList.contains('on')?'notes':'notebook')});
+  try{var saved=localStorage.getItem('mind-view');if(saved&&views[saved]&&location.hash!=='#notebook')show(saved)}catch(e){}
+  if(location.hash==='#notes')show('notes');
+  if(location.hash==='#notebook')show('notebook');
+
+  // toc selection
+  document.querySelectorAll('.toc a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();a.parentNode.querySelectorAll('a').forEach(function(x){x.classList.remove('on')});a.classList.add('on');side.classList.remove('open')})});
+
+  // approvals
+  document.querySelectorAll('[data-approve] [data-act="approve"]').forEach(function(b){
+    b.addEventListener('click',function(){var n=b.closest('.note');n.classList.add('done')});
+  });
+
+  // pause pendant
+  var dev=document.getElementById('device'),st=document.getElementById('devst'),pb=document.getElementById('pause');
+  pb.addEventListener('click',function(){
+    var p=dev.classList.toggle('paused');
+    st.innerHTML='<span class="dot"></span>'+(p?'Paused · mics off':'Listening · 62%');
+    pb.textContent=p?'Resume':'Pause';
+  });
+
+  // mobile menu
+  document.getElementById('menu').addEventListener('click',function(){side.classList.toggle('open')});
+  document.addEventListener('click',function(e){if(side.classList.contains('open')&&!side.contains(e.target)&&e.target.id!=='menu')side.classList.remove('open')});
+
+  // composer
+  var form=document.getElementById('compose'),msg=document.getElementById('msg'),thread=document.getElementById('thread');
+  function now(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  var replies={
+    'what did i promise this week?':'Three things. Last year’s deck to Priya by Monday, an intro to Ines, and the boat weekend you floated with your dad. The deck is drafted and waiting in Conversation notes.',
+    'who haven’t i seen in a while?':'Jonah. It’s been five weeks, and you were noticeably lighter after the last dinner. He’s free Thursday evening, if you want me to ask.',
+    'plan a sidequest for sunday':'The letterpress studio on Ferris Street has an open session from 2 to 5. Bring the poem you mentioned in March, and you can print it on their Vandercook. It’s a 12-minute walk.'
+  };
+  function add(text){
+    var t=text.trim(); if(!t) return;
+    var you=document.createElement('div'); you.className='entry row you fadein';
+    you.innerHTML='<div class="who"><span class="sp">YOU</span><span class="tm">'+now()+'</span></div><div class="txt"><p>'+esc(t)+'</p></div><div class="mg"></div>';
+    thread.appendChild(you);
+    var r=replies[t.toLowerCase()]||'Noted on today’s page. I’ll keep it in mind and bring it back when it matters.';
+    setTimeout(function(){
+      var m=document.createElement('div'); m.className='entry row fadein';
+      m.innerHTML='<div class="who"><span class="sp mind">MIND</span><span class="tm">'+now()+'</span></div><div class="txt"><p>'+r+'</p></div><div class="mg"></div>';
+      thread.appendChild(m); m.scrollIntoView({block:'end',behavior:'smooth'});
+    },650);
+    you.scrollIntoView({block:'end',behavior:'smooth'});
+  }
+  form.addEventListener('submit',function(e){e.preventDefault();add(msg.value);msg.value=''});
+  msg.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();add(msg.value);msg.value=''}});
+  document.querySelectorAll('.prompts button').forEach(function(b){b.addEventListener('click',function(){add(b.textContent)})});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mind M-01</title>
+<meta name="description" content="Mind M-01 is a small pendant that listens through your day, remembers what matters and taps you at the right moment.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bone:#EBE7DF;
+  --paper:#F6F3EE;
+  --panel:#E1DCD2;
+  --ink:#1D1C1A;
+  --ink-2:#55514A;
+  --ink-3:#8A857B;
+  --line:rgba(29,28,26,.15);
+  --line-2:rgba(29,28,26,.32);
+  --guide:rgba(29,28,26,.045);
+  --signal:#FF5B1A;
+  --signal-deep:#E2470B;
+  --signal-soft:#FFE1D2;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --sans:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --pad:40px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bone);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.45;font-variation-settings:"wdth" 100;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.dim{color:var(--ink-3)}
+
+/* ---------- frame + visible grid ---------- */
+.wrap{max-width:1360px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line);position:relative;
+  background-image:linear-gradient(to right,var(--guide) 1px,transparent 1px);background-size:calc(100%/12) 100%}
+.sec{position:relative;border-top:1px solid var(--line)}
+.sec::before,.sec::after{content:"+";position:absolute;top:-9px;font-family:var(--mono);font-size:14px;line-height:16px;color:var(--ink-2);background:var(--bone);width:16px;text-align:center}
+.sec::before{left:-9px}.sec::after{right:-9px}
+.sec-head{display:grid;grid-template-columns:repeat(12,1fr);padding:28px var(--pad) 0;gap:0 24px}
+.sec-tag{grid-column:1/4;display:flex;gap:10px;align-items:center}
+.sq{display:inline-block;width:8px;height:8px;background:var(--signal)}
+.sec-title{grid-column:4/10;font-size:62px;line-height:1;letter-spacing:-.028em;font-weight:600;font-variation-settings:"wdth" 92,"opsz" 96}
+.sec-aside{grid-column:10/13;color:var(--ink-2);font-size:16px;align-self:end}
+
+/* ---------- ticker ---------- */
+.ticker{background:var(--signal);color:var(--ink);overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--ink)}
+.ticker-track{display:inline-flex;animation:tick 48s linear infinite;padding:7px 0}
+.ticker span{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;padding-right:28px}
+.ticker i{font-style:normal;display:inline-block;width:6px;height:6px;background:var(--ink);margin:0 22px 1px 0;vertical-align:middle}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ---------- nav ---------- */
+.nav{display:grid;grid-template-columns:repeat(12,1fr);align-items:center;padding:14px var(--pad);gap:0 24px;border-bottom:1px solid var(--line);background:var(--bone);position:relative;z-index:3}
+.logo{grid-column:1/4;display:flex;align-items:baseline;gap:10px}
+.logo b{font-size:28px;letter-spacing:-.04em;font-weight:680;font-variation-settings:"wdth" 88,"opsz" 96;line-height:1}
+.logo b em{font-style:normal;color:var(--signal)}
+.nav-links{grid-column:4/10;display:flex;gap:28px;justify-content:center}
+.nav-links a{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.nav-links a:hover{color:var(--signal-deep)}
+.nav-cta{grid-column:10/13;justify-self:end;display:flex;gap:16px;align-items:center}
+
+/* keycap buttons */
+.key{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:11px 16px 10px;border:1.5px solid var(--ink);border-radius:7px;background:var(--paper);box-shadow:0 3px 0 var(--ink);cursor:pointer;transition:transform .08s,box-shadow .08s;white-space:nowrap}
+.key:hover{background:#fff}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.key.sig{background:var(--signal)}
+.key.sig:hover{background:#ff6d33}
+.key.ink{background:var(--ink);color:var(--paper)}
+.key.sm{padding:7px 11px 6px;font-size:11px;box-shadow:0 2px 0 var(--ink);border-radius:6px}
+.key.sm:active{box-shadow:0 0 0 var(--ink)}
+.led{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 2px rgba(255,91,26,.18),0 0 10px rgba(255,91,26,.7)}
+.led.off{background:#BDB6A9;box-shadow:inset 0 1px 1px rgba(0,0,0,.25)}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px;padding:0 var(--pad)}
+.hero-copy{grid-column:1/6;padding:56px 0 48px;display:flex;flex-direction:column}
+.hero-kicker{display:flex;gap:10px;align-items:center;margin-bottom:28px}
+.hero h1{font-size:100px;line-height:.92;letter-spacing:-.035em;font-weight:620;font-variation-settings:"wdth" 90,"opsz" 96;margin-bottom:28px}
+.hero h1 span{color:var(--signal)}
+.hero-sub{font-size:19px;line-height:1.45;color:var(--ink-2);max-width:440px;margin-bottom:32px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.hero-fine{color:var(--ink-3);margin-top:6px}
+.hero-fig{grid-column:6/13;position:relative;border-left:1px solid var(--line);margin-right:calc(var(--pad) * -1)}
+
+/* mind block (shared with app) */
+.blk{background:var(--paper);border:1px solid var(--ink);border-radius:4px;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.blk-h{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px dashed var(--line-2)}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;padding:3px 6px 2px;border-radius:2px;background:var(--ink);color:var(--paper);text-transform:uppercase}
+.tag.sig{background:var(--signal);color:var(--ink)}
+.tag.line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.blk-h .mono{font-size:10.5px}
+.blk-h .r{margin-left:auto}
+.blk-b{padding:12px 12px 14px;font-size:16px;line-height:1.4}
+.blk-a{display:flex;gap:8px;padding:0 12px 12px;flex-wrap:wrap}
+.hero-blk{margin-top:auto;max-width:440px}
+
+/* pendant figure */
+.fig{position:relative;width:100%;aspect-ratio:800/720}
+.fig svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.co{position:absolute;width:21%;font-size:13.5px;line-height:1.3}
+.co .mono{display:block;margin-bottom:3px;font-size:10.5px}
+.co .mono b{color:var(--signal-deep);font-weight:600}
+.co.l{text-align:right}
+.legend{display:none}
+.fig-meta{position:absolute;left:24px;bottom:18px;display:flex;gap:18px}
+.fig-meta2{position:absolute;right:24px;top:18px;text-align:right}
+@media (prefers-reduced-motion:no-preference){
+  .float{animation:float 7s ease-in-out infinite;transform-origin:400px 400px}
+  .ledpulse{animation:pulse 2.4s ease-in-out infinite}
+}
+@keyframes float{50%{transform:translateY(-6px) rotate(-1.2deg)}}
+@keyframes pulse{50%{opacity:.35}}
+
+/* spec strip */
+.specs{display:grid;grid-template-columns:repeat(6,1fr)}
+.spec{padding:20px var(--pad) 22px 24px;border-right:1px solid var(--line)}
+.spec:first-child{padding-left:var(--pad)}
+.spec:last-child{border-right:0}
+.spec .v{font-size:40px;font-weight:600;letter-spacing:-.02em;line-height:1;margin-top:10px;font-variation-settings:"wdth" 85,"opsz" 96}
+.spec .v small{font-family:var(--mono);font-size:12px;letter-spacing:0;font-weight:500;margin-left:6px;border:1px solid var(--ink);padding:1px 4px;border-radius:2px;vertical-align:6px}
+.spec .n{font-size:13px;color:var(--ink-2);margin-top:8px}
+
+/* ---------- how it works ---------- */
+.how{display:grid;grid-template-columns:repeat(3,1fr);margin-top:40px;border-top:1px solid var(--line)}
+.mod{border-right:1px solid var(--line);display:flex;flex-direction:column}
+.mod:last-child{border-right:0}
+.mod-h{display:flex;align-items:center;gap:10px;padding:12px 24px;border-bottom:1px solid var(--line)}
+.mod-h .sq{background:var(--ink)}
+.mod-h .r{margin-left:auto}
+.mod-body{padding:28px 24px 0}
+.mod h3{font-size:30px;line-height:1.02;letter-spacing:-.025em;font-weight:600;font-variation-settings:"wdth" 88,"opsz" 60;margin-bottom:10px}
+.mod p{color:var(--ink-2);font-size:16px;max-width:360px}
+.mod-vis{margin:28px 24px 28px;flex:1;display:flex;flex-direction:column;justify-content:flex-end}
+.wave{display:flex;align-items:center;gap:3px;height:56px;margin-bottom:14px}
+.wave i{display:block;width:4px;background:var(--ink);border-radius:2px}
+.wave i.s{background:var(--signal)}
+.tx{font-family:var(--mono);font-size:12.5px;line-height:1.55;border-top:1px solid var(--line)}
+.tx div{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tx b{font-weight:600}
+.tx .who-b{color:var(--signal-deep)}
+.mem{display:flex;flex-direction:column;gap:8px}
+.chip{display:grid;grid-template-columns:84px 1fr auto;gap:10px;align-items:center;background:var(--paper);border:1px solid var(--line-2);border-radius:4px;padding:9px 12px;font-size:14.5px}
+.chip .mono{font-size:10px}
+.chip em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+/* toggle switch */
+.sw{position:relative;width:46px;height:26px;border-radius:5px;background:#CBC4B7;box-shadow:inset 0 2px 3px rgba(0,0,0,.18),inset 0 0 0 1px rgba(0,0,0,.12);cursor:pointer;flex:none;border:0;transition:background .18s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:3px;background:linear-gradient(#FFFDF9,#E9E3D8);box-shadow:0 1px 0 rgba(0,0,0,.25),0 2px 4px rgba(0,0,0,.18);transition:left .18s cubic-bezier(.3,.7,.2,1)}
+.sw::before{content:"";position:absolute;top:10px;left:10px;width:8px;height:6px;z-index:1;background:repeating-linear-gradient(to right,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);transition:left .18s cubic-bezier(.3,.7,.2,1)}
+.sw[aria-checked="true"]{background:var(--signal)}
+.sw[aria-checked="true"]::after{left:23px}
+.sw[aria-checked="true"]::before{left:30px}
+
+/* ---------- use cases ---------- */
+.uc{display:grid;grid-template-columns:repeat(12,1fr);margin-top:40px;border-top:1px solid var(--line)}
+.uc-vis{grid-column:1/7;background:var(--signal);position:relative;overflow:hidden;min-height:620px;border-right:1px solid var(--ink)}
+.uc-vis .disc{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#FFF9F1,#F0E7D9 45%,#D9CDB9 85%,#C7B9A2);left:-120px;top:-110px;box-shadow:0 30px 60px rgba(90,30,0,.35)}
+.uc-vis .bar{position:absolute;right:60px;top:0;bottom:0;width:90px;background:var(--ink)}
+.uc-card{position:absolute;left:12%;right:12%;bottom:56px;transform:rotate(-1.5deg)}
+.uc-card .blk{box-shadow:0 18px 40px rgba(60,20,0,.28)}
+.uc-card .stub{display:flex;justify-content:space-between;padding:8px 12px;border-top:1px dashed var(--line-2)}
+.uc-label{position:absolute;left:24px;top:20px;color:var(--ink)}
+.uc-label.r{left:auto;color:var(--paper);top:20px;writing-mode:vertical-rl;transform:rotate(180deg);right:96px}
+.uc-list{grid-column:7/13;padding:0 var(--pad) 0 32px}
+.uc-item{border-bottom:1px dashed var(--line-2)}
+.uc-btn{width:100%;display:flex;align-items:center;gap:16px;background:none;border:0;padding:18px 0;cursor:pointer;text-align:left}
+.uc-btn .n{font-family:var(--mono);font-size:11px;color:var(--ink-3);width:22px}
+.uc-btn .t{font-size:24px;font-weight:600;letter-spacing:-.02em;text-transform:uppercase;font-variation-settings:"wdth" 80,"opsz" 40;flex:1}
+.uc-btn .pm{font-family:var(--mono);font-size:18px;color:var(--ink-2);width:20px;text-align:center}
+.uc-item.open .t{color:var(--ink)}
+.uc-item.open .n{color:var(--signal-deep)}
+.uc-panel{display:none;padding:0 0 20px 38px;color:var(--ink-2);font-size:16px;max-width:520px}
+.uc-item.open .uc-panel{display:block}
+.uc-btn:hover .t{color:var(--signal-deep)}
+
+/* ---------- object bento ---------- */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:240px;margin-top:40px;border-top:1px solid var(--line)}
+.tile{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 24px;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.tile:nth-child(4n){border-right:0}
+.tile .mono{color:var(--ink-2)}
+.tile .big{font-size:76px;font-weight:600;letter-spacing:-.035em;line-height:.9;font-variation-settings:"wdth" 88,"opsz" 96;margin-top:auto;display:flex;align-items:flex-start;gap:8px}
+.tile .big small{font-family:var(--mono);font-size:13px;letter-spacing:0;font-weight:500;border:1px solid var(--ink);padding:2px 5px;border-radius:2px;margin-top:8px}
+.tile p{font-size:14.5px;color:var(--ink-2);margin-top:10px;max-width:260px}
+.t-big{grid-column:span 2;grid-row:span 2;background:var(--panel)}
+.t-wide{grid-column:span 2}
+.finishes{flex:1;display:flex;align-items:center;justify-content:center;gap:28px;padding:12px 0}
+.fin{display:flex;flex-direction:column;align-items:center;gap:14px}
+.fin .d{width:150px;height:150px;border-radius:50%;position:relative;box-shadow:0 22px 30px rgba(60,40,20,.22),inset 0 -6px 14px rgba(0,0,0,.12)}
+.fin .d::after{content:"";position:absolute;inset:22px;border-radius:50%;box-shadow:inset 2px 3px 6px rgba(0,0,0,.12),inset -2px -2px 4px rgba(255,255,255,.5)}
+.fin .d::before{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:var(--signal);top:44px;right:48px;box-shadow:0 0 8px rgba(255,91,26,.8);z-index:1}
+.fin.bone .d{background:radial-gradient(circle at 36% 30%,#FFFCF6,#EDE6DA 50%,#CFC4B2)}
+.fin.graph .d{background:radial-gradient(circle at 36% 30%,#6A665F,#3B3935 50%,#24221F)}
+.fin.sig .d{background:radial-gradient(circle at 36% 30%,#FF9A6A,#FF5B1A 55%,#C93E07)}
+.fin.sig .d::before{background:#FFF1E8;box-shadow:0 0 8px #fff}
+.fin .mono{font-size:10.5px}
+.batt{display:flex;gap:4px;margin-top:22px;align-items:center}
+.batt i{display:block;width:16px;height:30px;border-radius:2px;background:var(--ink)}
+.batt i.e{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.batt b{width:5px;height:12px;background:var(--ink);border-radius:0 2px 2px 0;margin-left:2px}
+.keycap{width:86px;height:86px;border-radius:14px;background:linear-gradient(#FFFDF8,#E8E1D4);border:1.5px solid var(--ink);box-shadow:0 7px 0 var(--ink),0 14px 22px rgba(0,0,0,.15);position:absolute;right:28px;top:56px;display:grid;place-items:center;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.keycap:active{transform:translateY(5px);box-shadow:0 2px 0 var(--ink),0 6px 10px rgba(0,0,0,.15)}
+.keycap span{width:10px;height:10px;border-radius:50%;background:var(--signal);box-shadow:0 0 8px rgba(255,91,26,.8)}
+.haptic{display:flex;gap:28px;margin-top:auto;align-items:flex-end}
+.haptic>div{display:flex;flex-direction:column;gap:10px}
+.taps{display:flex;gap:6px;align-items:center;height:28px}
+.taps i{flex:none;display:block;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink)}
+.taps i.f{background:var(--ink)}
+.taps i.s{background:var(--signal);border-color:var(--signal)}
+
+/* ---------- privacy ---------- */
+.priv{display:grid;grid-template-columns:repeat(12,1fr);margin-top:40px;border-top:1px solid var(--line)}
+.priv-table{grid-column:1/7;padding:8px var(--pad) 40px}
+.row{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:16px}
+.row .mono{padding-top:3px}
+.board{grid-column:7/13;padding:32px var(--pad) 40px;border-left:1px solid var(--line);background:var(--panel)}
+.board-in{background:var(--paper);border:1.5px solid var(--ink);border-radius:10px;box-shadow:0 4px 0 var(--ink),0 24px 40px rgba(60,40,20,.12);overflow:hidden}
+.board-top{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--ink);background:var(--bone)}
+.board-top .r{margin-left:auto}
+.screws{display:flex;gap:6px}
+.screws i{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#B8B0A2);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);position:relative}
+.sw-row{display:grid;grid-template-columns:14px 1fr auto;gap:14px;align-items:center;padding:15px 18px;border-bottom:1px dashed var(--line-2)}
+.sw-row:last-child{border-bottom:0}
+.sw-row b{font-weight:600;font-size:16px;display:block}
+.sw-row span.s{font-size:13.5px;color:var(--ink-2)}
+.tri{display:inline-grid;grid-template-columns:repeat(3,auto);background:#CBC4B7;border-radius:5px;padding:3px;box-shadow:inset 0 2px 3px rgba(0,0,0,.18);gap:2px}
+.tri button{border:0;background:none;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:3px;cursor:pointer;font-weight:600;color:var(--ink-2)}
+.tri button[aria-pressed="true"]{background:linear-gradient(#FFFDF9,#E9E3D8);color:var(--ink);box-shadow:0 1px 0 rgba(0,0,0,.25),0 2px 4px rgba(0,0,0,.15)}
+
+/* ---------- waitlist ---------- */
+.wl{background:var(--signal);margin:0;padding:var(--pad);position:relative}
+.wl-frame{border:1px dashed rgba(29,28,26,.55);padding:64px 48px;position:relative;display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px}
+.wl-frame .c{position:absolute;font-family:var(--mono);font-size:14px;line-height:14px}
+.wl-frame .c.tl{top:-8px;left:-5px}.wl-frame .c.tr{top:-8px;right:-5px}.wl-frame .c.bl{bottom:-7px;left:-5px}.wl-frame .c.br{bottom:-7px;right:-5px}
+.wl h2{grid-column:1/8;font-size:76px;line-height:.96;letter-spacing:-.032em;font-weight:620;font-variation-settings:"wdth" 90,"opsz" 96}
+.wl-side{grid-column:8/13;align-self:end}
+.wl form{display:flex;gap:10px;margin-top:18px}
+.wl input{flex:1;min-width:0;background:var(--paper);border:1.5px solid var(--ink);border-radius:7px;padding:12px 14px;font-family:var(--mono);font-size:13px;box-shadow:inset 0 2px 0 rgba(0,0,0,.06)}
+.wl input:focus{outline:2px solid var(--ink);outline-offset:2px}
+.meter{display:flex;gap:3px;margin-top:10px}
+.meter i{flex:1;height:14px;background:var(--ink);border-radius:1px}
+.meter i.e{background:transparent;box-shadow:inset 0 0 0 1px rgba(29,28,26,.5)}
+.wl-meta{display:flex;justify-content:space-between;margin-top:8px}
+.wl p.s{font-size:16px;max-width:420px}
+.wl-ok{display:none;margin-top:18px;background:var(--paper);border:1.5px solid var(--ink);border-radius:7px;padding:12px 14px}
+
+/* ---------- footer ---------- */
+.foot{padding:40px var(--pad) 0}
+.foot-cols{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.foot-cols div{display:flex;flex-direction:column;gap:8px;font-size:15px}
+.foot-cols .mono{margin-bottom:6px;color:var(--ink-3)}
+.foot-cols a:hover{color:var(--signal-deep)}
+.fc1{grid-column:1/5}.fc2{grid-column:6/8}.fc3{grid-column:8/10}.fc4{grid-column:10/13}
+.word{font-size:clamp(120px,27vw,380px);line-height:.78;letter-spacing:-.025em;font-weight:680;font-variation-settings:"wdth" 88,"opsz" 96;margin-top:48px;display:flex;align-items:flex-end;justify-content:space-between;overflow:hidden;padding-bottom:6px}
+.word span.m{font-family:var(--mono);font-size:12px;letter-spacing:.08em;font-weight:500;line-height:1.5;text-align:right;padding-bottom:3%}
+.word em{font-style:normal;color:var(--signal)}
+.foot-base{display:flex;justify-content:space-between;gap:20px;padding:14px 0 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  .hero h1{font-size:84px}
+  .sec-title{font-size:52px;grid-column:4/13}
+  .sec-aside{grid-column:4/13;margin-top:14px}
+  .co{font-size:12.5px}
+}
+@media (max-width:980px){
+  :root{--pad:24px}
+  .wrap{background-size:calc(100%/4) 100%}
+  .nav-links{display:none}
+  .nav .logo{grid-column:1/7}.nav-cta{grid-column:7/13}
+  .hero{grid-template-columns:1fr}
+  .hero-copy,.hero-fig{grid-column:1/-1}
+  .hero-fig{border-left:0;border-top:1px solid var(--line);margin:0 calc(var(--pad) * -1)}
+  .hero-blk{margin-top:28px}
+  .co,.leader,.fig-meta2{display:none}
+  .legend{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+  .legend div{padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.3}
+  .legend div:nth-child(odd){border-right:1px solid var(--line)}
+  .legend .mono{display:block;margin-bottom:4px;font-size:10px}
+  .legend .mono b{color:var(--signal-deep)}
+  .specs{grid-template-columns:repeat(3,1fr)}
+  .spec,.spec:first-child{padding:16px var(--pad)}
+  .spec:nth-child(3){border-right:0}
+  .spec:nth-child(-n+3){border-bottom:1px solid var(--line)}
+  .sec-head{grid-template-columns:1fr}
+  .sec-tag,.sec-title,.sec-aside{grid-column:1/-1}
+  .sec-tag{margin-bottom:16px}
+  .how{grid-template-columns:1fr}
+  .mod{border-right:0;border-bottom:1px solid var(--line)}
+  .uc{grid-template-columns:1fr}
+  .uc-vis,.uc-list{grid-column:1/-1}
+  .uc-vis{min-height:460px;border-right:0}
+  .uc-list{padding:0 var(--pad)}
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .tile:nth-child(4n){border-right:1px solid var(--line)}
+  .tile:nth-child(2n){border-right:0}
+  .priv{grid-template-columns:1fr}
+  .priv-table,.board{grid-column:1/-1}
+  .board{border-left:0;border-top:1px solid var(--line)}
+  .wl-frame{grid-template-columns:1fr;padding:40px 24px}
+  .wl h2,.wl-side{grid-column:1/-1}
+  .wl-side{margin-top:24px}
+  .foot-cols{grid-template-columns:1fr 1fr}
+  .fc1,.fc2,.fc3,.fc4{grid-column:auto}
+  .fc1{grid-column:1/-1}
+}
+@media (max-width:560px){
+  :root{--pad:16px}
+  body{font-size:16px}
+  .nav .key span.long{display:none}
+  .hero-copy{padding:36px 0 32px}
+  .hero h1{font-size:60px}
+  .hero-sub{font-size:17px}
+  .sec-title{font-size:40px}
+  .specs{grid-template-columns:repeat(2,1fr)}
+  .spec{border-bottom:1px solid var(--line)}
+  .spec:nth-child(3){border-right:1px solid var(--line)}
+  .spec:nth-child(2n){border-right:0}
+  .spec .v{font-size:32px}
+  .legend{grid-template-columns:1fr}
+  .legend div:nth-child(odd){border-right:0}
+  .mod h3{font-size:26px}
+  .uc-vis{min-height:400px}
+  .uc-vis .disc{width:360px;height:360px;left:-90px;top:-80px}
+  .uc-vis .bar{right:28px;width:52px}
+  .uc-label.r{right:44px}
+  .uc-card{left:16px;right:16px;bottom:28px}
+  .uc-btn .t{font-size:19px}
+  .uc-panel{padding-left:38px}
+  .bento{grid-template-columns:1fr;grid-auto-rows:auto}
+  .tile{border-right:0 !important;min-height:200px}
+  .t-big,.t-wide{grid-column:auto;grid-row:auto}
+  .t-big{min-height:auto}
+  .finishes{gap:14px;flex-wrap:nowrap}
+  .fin .d{width:92px;height:92px}
+  .fin .d::after{inset:14px}
+  .fin .d::before{top:26px;right:28px;width:7px;height:7px}
+  .tile .big{font-size:64px}
+  .row{grid-template-columns:1fr;gap:4px}
+  .wl h2{font-size:46px}
+  .wl form{flex-direction:column}
+  .foot-cols{grid-template-columns:1fr 1fr}
+  .word{flex-direction:column;align-items:flex-start}
+  .word span.m{text-align:left;padding:0 0 10px}
+  .board{padding:24px 16px}
+  .sw-row{grid-template-columns:12px 1fr auto;gap:10px;padding:14px 14px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ticker-track{animation:none}
+  *{transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span><i></i>Batch 01: 2,400 units, shipping spring 2027</span>
+    <span><i></i>No screen, on purpose</span>
+    <span><i></i>The mic is gated, not gone</span>
+    <span><i></i>It will not tell you to drink water unless you ask</span>
+    <span><i></i>Hold the button 2 s to pause. It actually pauses</span>
+    <span><i></i>Batch 01: 2,400 units, shipping spring 2027</span>
+    <span><i></i>No screen, on purpose</span>
+    <span><i></i>The mic is gated, not gone</span>
+    <span><i></i>It will not tell you to drink water unless you ask</span>
+    <span><i></i>Hold the button 2 s to pause. It actually pauses</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<nav class="nav">
+  <a href="#" class="logo"><b>mind<em>.</em></b><span class="mono dim">M-01 / Rev C</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a><a href="#cases">Use cases</a><a href="#object">The object</a><a href="#privacy">Privacy</a>
+  </div>
+  <div class="nav-cta">
+    <a href="app.html" class="mono" style="font-size:12px">Open app ↗</a>
+    <a href="#waitlist" class="key sig sm">Join <span class="long">&nbsp;waitlist</span></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-copy">
+    <div class="hero-kicker"><span class="sq"></span><span class="mono">Mind M-01 — a pendant for your head</span></div>
+    <h1>Wear it.<br>Forget it.<br>It won't<span>.</span></h1>
+    <p class="hero-sub">Mind is a small pendant that listens through your day, remembers the people and promises you mention, and taps you at the right moment. Like this one:</p>
+    <div class="hero-ctas">
+      <a href="#waitlist" class="key sig">Reserve one — $0</a>
+      <a href="#object" class="key">Read the spec</a>
+    </div>
+    <p class="mono hero-fine">No deposit. 1,612 of 2,400 reserved.</p>
+
+    <div class="blk hero-blk" style="margin-top:36px">
+      <div class="blk-h"><span class="tag sig">Nudge</span><span class="mono dim">21:14 · Tue</span><span class="mono dim r">via pendant</span></div>
+      <div class="blk-b">You've been on TikTok for 52 minutes. Want to finish the chapter you started Tuesday? 31 pages left.</div>
+      <div class="blk-a"><button class="key sm sig">Open book</button><button class="key sm">5 more min</button><button class="key sm">Not tonight</button></div>
+    </div>
+  </div>
+
+  <div class="hero-fig">
+    <div class="fig" id="fig">
+      <svg viewBox="0 0 800 720" aria-label="Drawing of the Mind M-01 pendant with labelled parts" role="img">
+        <defs>
+          <radialGradient id="gBody" cx=".36" cy=".3" r=".78">
+            <stop offset="0" stop-color="#FFFDF8"/><stop offset=".45" stop-color="#EFE9DE"/><stop offset=".82" stop-color="#D7CEBF"/><stop offset="1" stop-color="#BFB4A1"/>
+          </radialGradient>
+          <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E4DDD0"/><stop offset="1" stop-color="#A99D88"/>
+          </linearGradient>
+          <radialGradient id="gFace" cx=".64" cy=".72" r=".85">
+            <stop offset="0" stop-color="#FBF8F2"/><stop offset=".6" stop-color="#E9E2D6"/><stop offset="1" stop-color="#D5CBBA"/>
+          </radialGradient>
+          <radialGradient id="gLens" cx=".4" cy=".35" r=".7">
+            <stop offset="0" stop-color="#4A4640"/><stop offset=".6" stop-color="#1A1816"/><stop offset="1" stop-color="#0B0A09"/>
+          </radialGradient>
+          <filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
+          <filter id="fGlow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="5"/></filter>
+          <path id="arc" d="M277.4,502.8 A160,160 0 0,0 522.6,502.8"/>
+        </defs>
+
+        <!-- leaders -->
+        <g class="leader" fill="none" stroke="#1D1C1A" stroke-width="1">
+          <polyline points="378,312 300,230 190,230"/>
+          <polyline points="370,470 190,470"/>
+          <polyline points="300,548 250,610 190,610"/>
+          <polyline points="440,118 610,118"/>
+          <polyline points="466,330 540,262 610,262"/>
+          <polyline points="592,400 610,400"/>
+          <polyline points="520,532 560,600 610,600"/>
+        </g>
+
+        <g class="float">
+          <ellipse cx="400" cy="622" rx="150" ry="20" fill="rgba(70,50,30,.32)" filter="url(#fBlur)"/>
+          <!-- cord -->
+          <path d="M391,200 C380,130 330,50 280,-30" fill="none" stroke="#2B2724" stroke-width="6" stroke-linecap="round"/>
+          <path d="M409,200 C420,130 470,50 520,-30" fill="none" stroke="#2B2724" stroke-width="6" stroke-linecap="round"/>
+          <path d="M391,200 C380,130 330,50 280,-30" fill="none" stroke="#7A6F64" stroke-width="1.5" stroke-linecap="round" opacity=".6" transform="translate(-1.5,-1)"/>
+          <path d="M409,200 C420,130 470,50 520,-30" fill="none" stroke="#7A6F64" stroke-width="1.5" stroke-linecap="round" opacity=".6" transform="translate(-1.5,-1)"/>
+          <!-- bail -->
+          <rect x="381" y="186" width="38" height="46" rx="17" fill="none" stroke="url(#gRim)" stroke-width="10"/>
+          <rect x="381" y="186" width="38" height="46" rx="17" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1"/>
+          <!-- side button -->
+          <rect x="570" y="370" width="22" height="60" rx="7" fill="url(#gRim)" stroke="rgba(0,0,0,.25)"/>
+          <!-- body -->
+          <circle cx="400" cy="400" r="180" fill="url(#gBody)"/>
+          <circle cx="400" cy="400" r="180" fill="none" stroke="rgba(60,40,20,.18)"/>
+          <circle cx="400" cy="400" r="176" fill="none" stroke="url(#gRim)" stroke-width="3" opacity=".9"/>
+          <!-- groove + face -->
+          <circle cx="400" cy="400" r="144" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2"/>
+          <circle cx="400" cy="400" r="142" fill="none" stroke="rgba(80,60,40,.22)" stroke-width="2"/>
+          <circle cx="400" cy="400" r="139" fill="url(#gFace)"/>
+          <!-- camera -->
+          <circle cx="400" cy="312" r="24" fill="#2A2724"/>
+          <circle cx="400" cy="312" r="24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1" transform="translate(.6,.8)"/>
+          <circle cx="400" cy="312" r="15" fill="url(#gLens)"/>
+          <circle cx="394" cy="306" r="4" fill="#fff" opacity=".65"/>
+          <circle cx="406" cy="318" r="1.8" fill="#fff" opacity=".3"/>
+          <!-- LED -->
+          <circle cx="466" cy="330" r="12" fill="#FF5B1A" filter="url(#fGlow)" class="ledpulse"/>
+          <circle cx="466" cy="330" r="6.5" fill="#FF5B1A"/>
+          <circle cx="464.5" cy="328.5" r="2.5" fill="#FFD1BB"/>
+          <!-- mic grille -->
+          <g fill="#3A342D" opacity=".72">
+            <circle cx="382" cy="458" r="3"/><circle cx="394" cy="458" r="3"/><circle cx="406" cy="458" r="3"/><circle cx="418" cy="458" r="3"/>
+            <circle cx="376" cy="470" r="3"/><circle cx="388" cy="470" r="3"/><circle cx="400" cy="470" r="3"/><circle cx="412" cy="470" r="3"/><circle cx="424" cy="470" r="3"/>
+            <circle cx="382" cy="482" r="3"/><circle cx="394" cy="482" r="3"/><circle cx="406" cy="482" r="3"/><circle cx="418" cy="482" r="3"/>
+          </g>
+          <!-- engraving -->
+          <text font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="3.2" fill="rgba(70,55,40,.5)"><textPath href="#arc" startOffset="50%" text-anchor="middle">MIND · M-01 · REV C · 14 G</textPath></text>
+        </g>
+
+        <!-- leader dots -->
+        <g class="leader">
+          <circle cx="378" cy="312" r="4" fill="#1D1C1A"/><circle cx="370" cy="470" r="4" fill="#1D1C1A"/><circle cx="300" cy="548" r="4" fill="#1D1C1A"/>
+          <circle cx="440" cy="118" r="4" fill="#1D1C1A"/><circle cx="466" cy="330" r="4" fill="#1D1C1A"/><circle cx="592" cy="400" r="4" fill="#1D1C1A"/><circle cx="520" cy="532" r="4" fill="#1D1C1A"/>
+          <g fill="none" stroke="#1D1C1A"><circle cx="378" cy="312" r="8"/><circle cx="466" cy="330" r="9"/></g>
+        </g>
+      </svg>
+      <div id="callouts"></div>
+      <div class="fig-meta2 mono dim">Fig. 1 — M-01, actual size ×6</div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+</header>
+
+<div class="specs sec">
+  <div class="spec"><span class="mono dim">Diameter</span><div class="v">32<small>mm</small></div></div>
+  <div class="spec"><span class="mono dim">Weight</span><div class="v">14<small>g</small></div><div class="n">About a house key.</div></div>
+  <div class="spec"><span class="mono dim">Battery</span><div class="v">1<small>day</small></div><div class="n">Charges in 40 min.</div></div>
+  <div class="spec"><span class="mono dim">Mics</span><div class="v">3<small>gated</small></div><div class="n">Beam-formed, wakes on speech.</div></div>
+  <div class="spec"><span class="mono dim">Camera</span><div class="v">0/1<small>opt</small></div><div class="n">Physical shutter.</div></div>
+  <div class="spec"><span class="mono dim">Screens</span><div class="v">0</div><div class="n">You have enough of those.</div></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="sec" id="how" style="margin-top:72px">
+  <div class="sec-head">
+    <div class="sec-tag"><span class="sq"></span><span class="mono">§01 — How it works</span></div>
+    <h2 class="sec-title">Three parts. No magic.</h2>
+    <p class="sec-aside">A pendant that hears, a memory that understands, and a quiet voice that knows when to speak up. That's the whole machine.</p>
+  </div>
+  <div class="how">
+    <div class="mod">
+      <div class="mod-h"><span class="sq"></span><span class="mono">01 / Hear</span><span class="mono dim r">Pendant</span></div>
+      <div class="mod-body">
+        <h3>It listens, and knows who's talking.</h3>
+        <p>Three mics wake on speech and sleep on silence. Everything is transcribed with speaker labels, then the audio is dropped.</p>
+      </div>
+      <div class="mod-vis">
+        <div class="wave" id="wave"></div>
+        <div class="tx">
+          <div><b>YOU</b><span>I keep saying I'll call Dad this week.</span></div>
+          <div><b class="who-b">MAYA</b><span>You said that in October.</span></div>
+          <div><b>YOU</b><span>…Fair.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mod">
+      <div class="mod-h"><span class="sq"></span><span class="mono">02 / Understand</span><span class="mono dim r">Memory</span></div>
+      <div class="mod-body">
+        <h3>It remembers your people, plans and patterns.</h3>
+        <p>Over weeks, Mind builds a private model of what matters to you, so a nudge is about your life and not anyone's.</p>
+      </div>
+      <div class="mod-vis">
+        <div class="mem">
+          <div class="chip"><span class="mono dim">Person</span><span>Dad</span><em>last call 23 d</em></div>
+          <div class="chip"><span class="mono dim">Goal</span><span>Finish <i>Piranesi</i></span><em>p.214/245</em></div>
+          <div class="chip"><span class="mono dim">Pattern</span><span>Scrolling after 21:00</span><em>5 of 7 nights</em></div>
+          <div class="chip"><span class="mono dim">Energy</span><span>Maya restores you</span><em>+ 12 wks</em></div>
+        </div>
+      </div>
+    </div>
+    <div class="mod">
+      <div class="mod-h"><span class="sq"></span><span class="mono">03 / Nudge + act</span><span class="mono dim r">You decide</span></div>
+      <div class="mod-body">
+        <h3>It taps you, or does the small thing for you.</h3>
+        <p>Low-risk things it can just do. Anything else waits for a flick of the switch. You set where that line is.</p>
+      </div>
+      <div class="mod-vis">
+        <div class="blk">
+          <div class="blk-h"><span class="tag">Action</span><span class="mono dim">Calendar</span><span class="mono dim r">Risk: low</span></div>
+          <div class="blk-b">Block <b>Sun 11:00–11:30</b>: "Call Dad." He's usually free after church.</div>
+          <div class="blk-a" style="align-items:center;justify-content:space-between">
+            <span class="mono dim" id="appr-l">Waiting for you</span>
+            <button class="sw" role="switch" aria-checked="false" aria-label="Approve action" id="appr"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="sec" id="cases" style="margin-top:72px">
+  <div class="sec-head">
+    <div class="sec-tag"><span class="sq"></span><span class="mono">§02 — Use cases</span></div>
+    <h2 class="sec-title">Made for the moments in between.</h2>
+    <p class="sec-aside">Seven things it's good at. Pick one and the printout shows what Mind would actually say.</p>
+  </div>
+  <div class="uc">
+    <div class="uc-vis">
+      <div class="disc"></div>
+      <div class="bar"></div>
+      <span class="mono uc-label">Fig. 2 — Sample output</span>
+      <span class="mono uc-label r">Printed on demand</span>
+      <div class="uc-card">
+        <div class="blk" id="ucCard">
+          <div class="blk-h"><span class="tag sig" id="ucTag">Nudge</span><span class="mono dim" id="ucTime">21:14 · Tue</span><span class="mono dim r" id="ucSrc">via pendant</span></div>
+          <div class="blk-b" id="ucText" style="font-size:19px;line-height:1.35"></div>
+          <div class="blk-a" id="ucActs"></div>
+          <div class="stub"><span class="mono dim" id="ucWhy">Because: 52 min, after 21:00</span><span class="mono dim">#0412</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="uc-list" id="ucList"></div>
+  </div>
+</section>
+
+<!-- OBJECT -->
+<section class="sec" id="object" style="margin-top:72px">
+  <div class="sec-head">
+    <div class="sec-tag"><span class="sq"></span><span class="mono">§03 — The object</span></div>
+    <h2 class="sec-title">Small enough to forget. Nice enough to fidget with.</h2>
+    <p class="sec-aside">Glazed ceramic over a recycled aluminium core. It warms up to body temperature in about four minutes, which is our favourite spec.</p>
+  </div>
+  <div class="bento">
+    <div class="tile t-big">
+      <span class="mono">Finishes</span>
+      <div class="finishes">
+        <div class="fin bone"><div class="d"></div><span class="mono">Bone</span></div>
+        <div class="fin graph"><div class="d"></div><span class="mono">Graphite</span></div>
+        <div class="fin sig"><div class="d"></div><span class="mono">Signal — ltd</span></div>
+      </div>
+      <p style="max-width:none">Three glazes, each fired twice. Signal is limited to Batch 01, mostly because we couldn't stop looking at it.</p>
+    </div>
+    <div class="tile">
+      <span class="mono">Battery</span>
+      <div class="batt"><i></i><i></i><i></i><i></i><i></i><i class="e"></i><b></b></div>
+      <div class="big">18<small>h</small></div>
+      <p>A full waking day. Sleeps on its magnetic puck at night.</p>
+    </div>
+    <div class="tile">
+      <span class="mono">Button</span>
+      <button class="keycap" aria-label="Pause button"><span></span></button>
+      <div class="big">1</div>
+      <p>Hold to pause. Tap to mark a moment worth keeping.</p>
+    </div>
+    <div class="tile">
+      <span class="mono">Weather</span>
+      <div class="big">IP54</div>
+      <p>Rain, sweat, and the occasional soup.</p>
+    </div>
+    <div class="tile">
+      <span class="mono">Charge</span>
+      <div class="big">40<small>min</small></div>
+      <p>Zero to full on the puck. USB-C on the other end.</p>
+    </div>
+    <div class="tile t-wide">
+      <span class="mono">Haptics</span>
+      <p style="font-size:22px;color:var(--ink);max-width:420px;line-height:1.2;letter-spacing:-.01em">It doesn't beep. It taps you on the sternum, gently, like a friend at a concert.</p>
+      <div class="haptic">
+        <div><div class="taps"><i class="f"></i></div><span class="mono dim">1 tap — glance at phone</span></div>
+        <div><div class="taps"><i class="f"></i><i class="f"></i></div><span class="mono dim">2 — needs approval</span></div>
+        <div><div class="taps"><i class="s"></i><i class="s"></i><i class="s"></i></div><span class="mono dim">3 — leave now</span></div>
+      </div>
+    </div>
+    <div class="tile">
+      <span class="mono">Cord</span>
+      <div class="big">70<small>cm</small></div>
+      <p>Waxed cotton. Or clip it to a collar, a strap, a lanyard.</p>
+    </div>
+    <div class="tile">
+      <span class="mono">Memory</span>
+      <div class="big">72<small>h</small></div>
+      <p>Rolling on-device buffer if your phone is out of range.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="sec" id="privacy" style="margin-top:72px">
+  <div class="sec-head">
+    <div class="sec-tag"><span class="sq"></span><span class="mono">§04 — Privacy</span></div>
+    <h2 class="sec-title">Privacy is a row of switches, not a PDF.</h2>
+    <p class="sec-aside">Every setting that matters is a switch you can see, in the app and on the object. Defaults are the cautious ones.</p>
+  </div>
+  <div class="priv">
+    <div class="priv-table">
+      <div class="row"><span class="mono">Audio stored</span><span>Never. Transcribed on device, then dropped.</span></div>
+      <div class="row"><span class="mono">Processing</span><span>On-device first. Anything that leaves is end-to-end encrypted.</span></div>
+      <div class="row"><span class="mono">Camera</span><span>Off until you slide the shutter open. The LED tells everyone.</span></div>
+      <div class="row"><span class="mono">Other people</span><span>Not remembered until you introduce them. Strangers stay strangers.</span></div>
+      <div class="row"><span class="mono">Pause</span><span>Hold the button for 2 seconds. The mics are cut in hardware.</span></div>
+      <div class="row"><span class="mono">Delete</span><span>One button deletes everything. No exit survey.</span></div>
+    </div>
+    <div class="board">
+      <div class="board-in">
+        <div class="board-top"><div class="screws"><i></i><i></i></div><span class="mono">Privacy panel — M-01</span><span class="mono dim r">Your defaults</span></div>
+        <div class="sw-row"><span class="led" data-led="mic"></span><div><b>Microphones</b><span class="s">Wakes on speech, sleeps on silence</span></div><button class="sw" role="switch" aria-checked="true" data-for="mic" aria-label="Microphones"></button></div>
+        <div class="sw-row"><span class="led off" data-led="cam"></span><div><b>Camera</b><span class="s">Off unless the shutter is open</span></div><button class="sw" role="switch" aria-checked="false" data-for="cam" aria-label="Camera"></button></div>
+        <div class="sw-row"><span class="led" data-led="loc"></span><div><b>Location</b><span class="s">Neighbourhood-level, for sidequests</span></div><button class="sw" role="switch" aria-checked="true" data-for="loc" aria-label="Location"></button></div>
+        <div class="sw-row"><span class="led off" data-led="ppl"></span><div><b>Remember new people</b><span class="s">Only after you introduce them</span></div><button class="sw" role="switch" aria-checked="false" data-for="ppl" aria-label="Remember new people"></button></div>
+        <div class="sw-row"><span class="led" data-led="act"></span><div><b>Act without asking</b><span class="s">How far Mind can go on its own</span></div>
+          <div class="tri" role="group" aria-label="Act without asking"><button aria-pressed="false">Never</button><button aria-pressed="true">Low risk</button><button aria-pressed="false">More</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="sec wl" id="waitlist" style="margin-top:72px">
+  <div class="wl-frame">
+    <span class="c tl">+</span><span class="c tr">+</span><span class="c bl">+</span><span class="c br">+</span>
+    <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;margin-bottom:28px"><span class="sq" style="background:var(--ink)"></span><span class="mono">§05 — Waitlist</span></div>
+    <h2>Batch 01 is 2,400 units. One could be yours.</h2>
+    <div class="wl-side">
+      <p class="s">No deposit. We'll email you twice: once when it's real, once when it ships. Maybe a third time if the Signal glaze sells out.</p>
+      <form id="wlForm" novalidate>
+        <input type="email" placeholder="you@somewhere.com" aria-label="Email address" required>
+        <button class="key ink" type="submit">Reserve</button>
+      </form>
+      <div class="wl-ok mono" id="wlOk">Reserved. Unit #1,613 has your name on it.</div>
+      <div class="meter" id="meter"></div>
+      <div class="wl-meta"><span class="mono">1,612 / 2,400 reserved</span><span class="mono">Ships spring 2027</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="sec foot">
+  <div class="foot-cols">
+    <div class="fc1"><span class="mono">Mind Objects Co.</span><span style="max-width:340px;color:var(--ink-2)">Designed in Oakland. Assembled slowly. Tested on ourselves, our parents and one very patient dog.</span></div>
+    <div class="fc2"><span class="mono">Product</span><a href="#how">How it works</a><a href="#object">Spec sheet</a><a href="app.html">The app</a></div>
+    <div class="fc3"><span class="mono">Trust</span><a href="#privacy">Privacy panel</a><a href="#">Security notes</a><a href="#">Data deletion</a></div>
+    <div class="fc4"><span class="mono">Elsewhere</span><a href="#">Field notes (blog)</a><a href="#">Instagram</a><a href="#">Careers — we're hiring</a></div>
+  </div>
+  <div class="word" aria-hidden="true"><span>mind<em>.</em></span><span class="m">Model M-01<br>Rev C · 2026<br>Batch 01 of 01</span></div>
+  <div class="foot-base"><span class="mono dim">© 2026 Mind Objects Co.</span><span class="mono dim">Made with 14 g of restraint</span><span class="mono dim">Back to top ↑</span></div>
+</footer>
+
+</div>
+
+<script>
+// callouts
+const CO=[
+  {n:'01',k:'Cord',t:'70 cm waxed cotton. Or clip it on.',x:618,y:118,s:'r'},
+  {n:'02',k:'LED',t:'Orange means listening. Off means off.',x:618,y:262,s:'r'},
+  {n:'03',k:'Button',t:'Hold 2 s to pause. Really pause.',x:618,y:400,s:'r'},
+  {n:'04',k:'Finish',t:'Glazed ceramic, warm to the touch.',x:618,y:600,s:'r'},
+  {n:'05',k:'Camera',t:'Optional. Has a physical shutter.',x:182,y:230,s:'l'},
+  {n:'06',k:'Mic ×3',t:'Always-on, gated. Audio never stored.',x:182,y:470,s:'l'},
+  {n:'07',k:'Battery',t:'1 day. 40 min on the puck.',x:182,y:610,s:'l'},
+];
+const box=document.getElementById('callouts'),leg=document.getElementById('legend');
+CO.forEach(c=>{
+  const d=document.createElement('div');d.className='co '+c.s;
+  d.style.top=((c.y-9)/720*100)+'%';
+  if(c.s==='r'){d.style.left=(c.x/800*100)+'%'}else{d.style.right=((800-c.x)/800*100)+'%'}
+  d.innerHTML=`<span class="mono"><b>${c.n}</b> — ${c.k}</span>${c.t}`;box.appendChild(d);
+  const l=document.createElement('div');l.innerHTML=`<span class="mono"><b>${c.n}</b> — ${c.k}</span>${c.t}`;leg.appendChild(l);
+});
+leg.innerHTML=[...leg.children].sort((a,b)=>a.textContent.localeCompare(b.textContent)).map(e=>e.outerHTML).join('');
+
+// waveform
+const w=document.getElementById('wave');
+const hs=[8,14,22,30,18,26,40,32,20,12,6,10,18,34,46,38,24,16,8,6,12,20,28,22,14,30,42,36,26,18,10,8,14,24,18,10,6];
+hs.forEach((h,i)=>{const b=document.createElement('i');b.style.height=h+'px';if(i>=12&&i<=19)b.className='s';w.appendChild(b)});
+
+// switches
+document.querySelectorAll('.sw').forEach(s=>s.addEventListener('click',()=>{
+  const on=s.getAttribute('aria-checked')!=='true';s.setAttribute('aria-checked',on);
+  const f=s.dataset.for;if(f){document.querySelector(`[data-led="${f}"]`).classList.toggle('off',!on)}
+  if(s.id==='appr'){document.getElementById('appr-l').textContent=on?'Approved · added 10:14':'Waiting for you'}
+}));
+document.querySelectorAll('.tri').forEach(g=>g.addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return;g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===e.target));
+  document.querySelector('[data-led="act"]').classList.toggle('off',e.target.textContent==='Never');
+}));
+
+// use cases
+const UC=[
+  {t:'Doomscroll exit',tag:'Nudge',sig:1,time:'21:14 · Tue',src:'via pendant',why:'Because: 52 min, after 21:00',
+   txt:"You've been on TikTok for 52 minutes. Want to finish the chapter you started Tuesday? 31 pages left.",acts:['Open book','5 more min'],
+   d:'Not a block, not a lecture. One personal first step out, drawn from something you already wanted to do.'},
+  {t:'Acts on your behalf',tag:'Action',time:'16:02 · Wed',src:'Messages + OpenTable',why:'Risk: low · needs your OK',
+   txt:'Maya said Thursday works. Book 7:30 at Lalo\'s for two and text her "see you there"?',acts:['Approve','Change time'],
+   d:'Small errands it can run through your connected apps. Low-risk things it just does; the rest wait for a switch.'},
+  {t:'Relationship energy',tag:'Note',time:'14:40 · Sat',src:'from 3 conversations',why:'Pattern: 3 of 3 lunches',
+   txt:'You left lunch with Sam lighter than you arrived. Third time this month. Maybe that Thursday slot is his.',acts:['Suggest a plan','Noted'],
+   d:'Who restores you and who drains you, measured by how you actually sound, not how you think you should feel.'},
+  {t:'Sidequests',tag:'Sidequest',sig:1,time:'11:20 · Sat',src:'0.8 mi away',why:'Because: "I want to print my own cards"',
+   txt:'There\'s a letterpress open studio on 18th St, 2–5 pm today. Bring the card design you sketched in March.',acts:['Add to today','Skip'],
+   d:'Small adventures pulled from things you\'ve said you love, sized to the free hours you actually have.'},
+  {t:'Habits & routine',tag:'Note',time:'07:12 · Fri',src:'morning check',why:'Streak: 4 of 5 mornings',
+   txt:'Four of five mornings without your phone in bed. Tomorrow makes a week. The alarm is already across the room.',acts:['Keep going','Adjust'],
+   d:'It notices the routines you\'re building and the ones quietly slipping, then nudges at the moment it matters.'},
+  {t:'Conversation notes',tag:'Note',time:'10:31 · Mon',src:'standup · 14 min',why:'3 speakers · 2 commitments',
+   txt:'You agreed to send the deck by Friday. Priya owns the budget question. Leo seemed unsure about the date.',acts:['Open notes','Remind Thu'],
+   d:'Speaker-labelled notes from the conversations you choose to keep, with commitments pulled out for you.'},
+  {t:'Anticipation',tag:'Action',time:'04:50 · Thu',src:'Calendar + Maps',why:'Done automatically · low risk',
+   txt:'Flight at 7:05. Leave by 5:10, there\'s roadwork on the 101. I moved your alarm 15 minutes earlier.',acts:['Thanks','Undo'],
+   d:'What you\'ll need before you ask: the leaving time, the forgotten charger, the birthday on Sunday.'},
+];
+const list=document.getElementById('ucList');
+UC.forEach((u,i)=>{
+  const it=document.createElement('div');it.className='uc-item'+(i===0?' open':'');
+  it.innerHTML=`<button class="uc-btn" aria-expanded="${i===0}"><span class="n">0${i+1}</span><span class="t">${u.t}</span><span class="pm">${i===0?'−':'+'}</span></button><div class="uc-panel">${u.d}</div>`;
+  it.querySelector('button').addEventListener('click',()=>pick(i));list.appendChild(it);
+});
+function pick(i){
+  const u=UC[i];
+  [...list.children].forEach((el,j)=>{el.classList.toggle('open',j===i);el.querySelector('.pm').textContent=j===i?'−':'+';el.querySelector('button').setAttribute('aria-expanded',j===i)});
+  const tag=document.getElementById('ucTag');tag.textContent=u.tag;tag.className='tag'+(u.sig?' sig':'');
+  document.getElementById('ucTime').textContent=u.time;document.getElementById('ucSrc').textContent=u.src;
+  document.getElementById('ucText').textContent=u.txt;document.getElementById('ucWhy').textContent=u.why;
+  document.getElementById('ucActs').innerHTML=u.acts.map((a,k)=>`<button class="key sm${k===0?' sig':''}">${a}</button>`).join('');
+}
+pick(0);
+
+// meter
+const m=document.getElementById('meter');for(let i=0;i<40;i++){const e=document.createElement('i');if(i>=27)e.className='e';m.appendChild(e)}
+document.getElementById('wlForm').addEventListener('submit',e=>{e.preventDefault();e.target.style.display='none';document.getElementById('wlOk').style.display='block'});
+</script>
+</body>
+</html>
