@@ -1,1 +1,6 @@
+*.MP4
+*.m4a
+*.mov
+nice-screen-recordings/
 wali-launch.mp4
+.DS_Store
